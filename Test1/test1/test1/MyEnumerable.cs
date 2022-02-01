@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 // Test change git
-
+// Виктор был здесь
 namespace test1
 {
     public class MyEnumerator : IEnumerator<int>

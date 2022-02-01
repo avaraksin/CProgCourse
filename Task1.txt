@@ -1,0 +1,94 @@
+1. Есть интерфейс IMyEnumerator:
+
+    public interface IMyEnumerator<T>
+    {
+        T Current { get; }
+
+        public bool MoveNext();
+
+        public void Reset();
+    }
+
+Реализовать класс RandomListEnumerator, который будет возвращать числа из листа интов в случайном порядке.
+
+    public class RandomListEnumerator : IMyEnumerator<int>
+    {
+        // конструктор, принимает список интов
+        public RandomListEnumerator(List<int> list)
+        {
+
+        }
+
+        // получить текущее значение итератора
+        public int Current => throw new NotImplementedException();
+
+        // сдвинуть итератор так, чтобы он выдал следующий случайный элемент списка
+        // вернёт true, если мы успешно перешли к следующему элементу коллекции
+        // или false, если мы уже в конце коллекции находимся
+        public bool MoveNext()
+        {
+            throw new NotImplementedException();
+        }
+
+        // сбросить итератор, в следующий раз MoveNext() начнёт сначала
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+Как тестировать:
+
+	var list = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
+	RandomListEnumerator rle = new RandomListEnumerator(list);
+
+	// тут мы должны вывести все элементы 
+	for (var i = 0; i < list.Count; i++)
+	{
+		if (rle.MoveNext()) 
+		{
+			Console.WriteLine(rle.Current);
+		}
+	}
+
+	// тут мы по идее уже прошли все элементы коллекции, так что должен возвращаться просто последний
+	rle.MoveNext();
+	Console.WriteLine(rle.Current);
+
+	rle.MoveNext();
+	Console.WriteLine(rle.Current);
+
+	// сбрасываем счётчик
+	rle.Reset()
+
+	// тут мы должны снова вывести все элементы, должны выводиться в новом случайном порядке
+	for (var i = 0; i < list.Count; i++)
+	{
+		if (rle.MoveNext()) 
+		{
+			Console.WriteLine(rle.Current);
+		}
+	}
+
+2. Написать реализацию RandomList интерфейса IRandomEnumerable, которая будет возвращать наш итератор. Наш список будет полем в этом классе.
+
+public interface IRandomEnumerable
+{
+	public IMyEnumerator<T> GetEnumerator();
+}
+
+3. В конце концов, должен отработать этот код и вывести нам элементы в случайном порядке:
+var randomList = new RandomList(new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 });
+randomEnumerator = randomList.GetEnumerator();
+for (randomEnumerator.MoveNext()) 
+{
+	Console.WriteLine(randomEnumerator.Current);
+}
+
+Именно так под капотом и работает foreach. Теперь можно переделать под настоящие IEnumerable и IEnumerator :)
+
+Чтение
+https://www.geeksforgeeks.org/difference-between-abstract-class-and-interface-in-c-sharp/
+https://stackoverflow.com/questions/747517/interfaces-vs-abstract-classes
+https://docs.microsoft.com/ru-ru/dotnet/csharp/language-reference/keywords/interface
+https://docs.microsoft.com/ru-ru/dotnet/csharp/language-reference/keywords/abstract

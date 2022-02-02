@@ -104,7 +104,7 @@ namespace test1
         static void Main(string[] args)
         {
             // ***************************************** ЗАДАНИЕ 1 ************************************************************************ 
-       
+            /*
             var list = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 };
             RandomListEnumerator rle = new RandomListEnumerator(list);
 
@@ -139,7 +139,7 @@ namespace test1
                     break;
                 }
             }
-            
+            */
             // ************************************ ЗАДАНИЕ 2 *************************************************************************
             /*
             RandomList randomList = new RandomList(new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8 });

@@ -1,0 +1,10 @@
+git status 
+git add имя_файла
+git add . 
+git commit -m "commit message"
+git push
+
+git checkout имя_ветки
+git checkout -b имя_новой_ветки
+
+git merge, git rebase

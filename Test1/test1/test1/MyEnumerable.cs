@@ -11,9 +11,9 @@ namespace test1
     public class MyEnumerator : IEnumerator<int>
     {
         // list - состояние, не должно храниться в енумераторе, должно быть полем Enumerable, возможно хранится ссылка, но не копия
-        //private List<int> list;
+        private List<int> list;
         private readonly int icount;
-        //private readonly List<int> storeList;
+        private List<int> listpassed;
         public MyEnumerator(List<int> list)
         {         
             if (list == null || list.Count ==0)
@@ -21,9 +21,9 @@ namespace test1
                 icount = -1;
                 return;
             }
-            //this.list = new List<int>(list) ;
-            //storeList = new List<int>(list);
+            this.list = list;
             icount = 0;
+            listpassed = new List<int>();
         }
 
         // Current не должен изменять состояние
@@ -34,9 +34,15 @@ namespace test1
             {
                 if (icount == -1) return 0;
 
-                int maxValue = list.Max(i => i);
-                list.Remove(maxValue);
-                return maxValue;
+                if (listpassed.Count == list.Count) return 0;
+
+                int rValue = new Random().Next(list.Count);
+                while (listpassed.Contains(rValue))
+                {
+                    rValue = new Random().Next(list.Count);
+                }
+                listpassed.Add(rValue);
+                return list[rValue];
             }
         }
         object IEnumerator.Current => throw new NotImplementedException();
@@ -45,7 +51,7 @@ namespace test1
         public bool MoveNext()
         {
             if (icount == -1) return false;
-            if (list.Count == 0) return false;
+            if (listpassed.Count == list.Count) return false;
             return true;
         }
 
@@ -53,7 +59,7 @@ namespace test1
         {
             if(icount == -1) return;
 
-            list = new List<int>(storeList);
+            listpassed = new List<int>();
         }
     }
 

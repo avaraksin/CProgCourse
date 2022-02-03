@@ -10,6 +10,17 @@ namespace SeaBattle
     {
         private List<Ship> AllShips;
         private int[] printarea;
+        public int bitShips {get; private set;}
+
+        public bool GameOver
+        {
+            get
+            {
+                return bitShips == AllShips.Count;
+            }
+        }
+
+        public int GetbitShipStatus { get; private set; }
         
         internal Shiparea()
         {
@@ -47,6 +58,7 @@ namespace SeaBattle
                     SetShipInArea(ship);
                 }
             }
+            bitShips = 0;
 
         }
 
@@ -70,6 +82,47 @@ namespace SeaBattle
                 Console.WriteLine(row);
             }
 
+        }
+
+        internal int ChekShoot(String spnt)
+        {
+            return CheckShoot(Func.GetPoint(spnt));
+        }
+
+        internal int CheckShoot(int pnt) // -1 - неправильный ход, 0 - не попал (переход хода), 1 - попал (ход сохраняется).
+        {
+            if (pnt < 1 || pnt > 100) return -1;
+
+            if (printarea[pnt] > 1) return -1;
+
+            if (printarea[pnt] == 0)
+            {
+                printarea[pnt] = 2;
+                return 0;
+            }
+
+            for(int i = 0; i < AllShips.Count; i++)
+            {
+                if (AllShips[i].shiparea.Contains(pnt))
+                {
+                    if (AllShips[i].SetShipStatus(pnt) )
+                    {
+                        foreach (int ind in AllShips[i].freeField)
+                        {
+                            printarea[ind] = 2;
+                        }
+                        bitShips++;
+                        GetbitShipStatus = 2;
+                        break;
+                    }
+                    GetbitShipStatus = 1;
+                    break;
+                }
+            }
+
+            printarea[pnt] = 3;
+
+            return 1;
         }
 
         private void SetShipInArea(Ship ship)

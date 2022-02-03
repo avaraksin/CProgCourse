@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,31 +10,104 @@ namespace SeaBattle
     internal class Program
     {
         static void Main(string[] args)
-        {
-            
-            //Console.BackgroundColor = ConsoleColor.White;
-            
+        {            
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            
-            //Console.WriteLine("\u2592"); //Поле
-            //Console.WriteLine("\u2588"); // Корабль
-            //Console.WriteLine("\u25CF"); // мимо
 
-            //Console.WriteLine(" ABCDEFGHIJ");
-            //Console.WriteLine("1\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592");
-            //Console.WriteLine("2\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592");
-            //Console.WriteLine("3\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592");
-            //Console.WriteLine("4\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592");
-            //Console.WriteLine("5\u2592\u2592\u25CF\u25CF\u2592\u2592\u2592\u2592\u2592\u2592");
-            //Console.WriteLine("6\u2588\u2588XX\u2592\u2592\u2592\u2592\u2592\u2592");
-            //Console.WriteLine("7\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592\u2592");
+            bool GameOn = true;
 
-            Shiparea shiparea = new Shiparea();
-            shiparea.CreateShipArea();
+            while (GameOn)
+            {
+                Shiparea hum = new Shiparea();
+                Shiparea bil = new Shiparea();
+                hum.CreateShipArea();
+                bil.CreateShipArea();
+                int retanswer = 0;
 
-            shiparea.PrintArea(true);
+                while (GameOn && !bil.GameOver && !hum.GameOver)
+                {
+                    do
+                    {
+                        Console.WriteLine();
+                        Console.Write("Ваш ход: ");
+                        string answ = Console.ReadLine();
+                        if (answ.ToLower() == "status")
+                        {
+                            Console.WriteLine("Ваша карта:");
+                            hum.PrintArea(true); 
+                            retanswer = 1;
+                            continue;
+                        }
+                        else if (answ.ToLower() == "exit")
+                        {
+                            GameOn = false;
+                            Console.WriteLine("Ваша карта: ");
+                            hum.PrintArea(true);
+                            Console.WriteLine("Карта компьютера: ");
+                            bil.PrintArea(true);
+                            retanswer = 0;
+                            break;
+                        }
+                        else
+                        {
+                            retanswer = bil.ChekShoot(answ);
+                            if (retanswer == -1)
+                            {
+                                Console.WriteLine("Неправильный ввод!");
+                                retanswer = 1;
+                            }
+                            else if (retanswer == 0)
+                            {
+                                Console.WriteLine("Мимо!");
+                                bil.PrintArea();
+                            }
+                            else
+                            {
+                                if (bil.GetbitShipStatus == 1)
+                                    Console.WriteLine("Ранен!");
+                                else
+                                    Console.WriteLine("Потоплен!");
 
+                                bil.PrintArea();
+                            }
 
+                        }
+                    } while (retanswer > 0);
+
+                    if (GameOn)
+                    {
+                        do
+                        {
+                            Console.WriteLine();
+                            int pnt;
+                            do
+                            {
+                                pnt = new Random().Next(1, 101);
+                                retanswer = hum.CheckShoot(pnt);
+                            } while (retanswer == -1);
+                            Console.WriteLine("Ход компьютера: " + Func.GetAddress(pnt));
+                            if (retanswer == 0)
+                            {
+                                Console.WriteLine("Мимо!");
+                            }
+                            else
+                            {
+                                if (hum.GetbitShipStatus == 1)
+                                    Console.WriteLine("Ранен!");
+                                else
+                                    Console.WriteLine("Потоплен!");
+                            }
+
+                        } while (retanswer > 0);
+                    }
+                }
+
+               if (GameOn)
+                {
+                    Console.Write("Играем еще (Y/N): ");
+                    String answ = Console.ReadLine();
+                    if (answ.ToLower() != "y") GameOn = false;
+                }
+            }
 
             Console.ReadKey();
         }

@@ -15,6 +15,9 @@ namespace SeaBattle
         public List<int> shiparea { get; private set; }
         
         public List<int> freeField { get; private set; }            // Свободное поле вокруг корабля
+
+        private int bitdecks; 
+
         public Ship(int decksnum)
         {
             this.decksnum = decksnum;
@@ -88,11 +91,18 @@ namespace SeaBattle
                     }
                 }
 
+                bitdecks = 0;
                 return true;
             }
             return false;
         }
 
+        internal bool SetShipStatus(int pnt)
+        {
+            bitdecks++;
+            if (bitdecks == decksnum) return true;
+            return false;
+        }
 
     }
 }

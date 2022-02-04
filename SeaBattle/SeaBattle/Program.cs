@@ -22,6 +22,8 @@ namespace SeaBattle
                 hum.CreateShipArea();
                 bil.CreateShipArea();
                 int retanswer = 0;
+                Strat.SetStratOff();
+                int pnt = 0;
 
                 while (GameOn && !bil.GameOver && !hum.GameOver)
                 {
@@ -49,7 +51,7 @@ namespace SeaBattle
                         }
                         else
                         {
-                            retanswer = bil.ChekShoot(answ);
+                            retanswer = bil.CheckShoot(answ);
                             if (retanswer == -1)
                             {
                                 Console.WriteLine("Неправильный ввод!");
@@ -78,10 +80,10 @@ namespace SeaBattle
                         do
                         {
                             Console.WriteLine();
-                            int pnt;
                             do
                             {
-                                pnt = new Random().Next(1, 101);
+                                pnt = Strat.SetNewPoint(pnt);
+                                //pnt = new Random().Next(1, 101);
                                 retanswer = hum.CheckShoot(pnt);
                             } while (retanswer == -1);
                             Console.WriteLine("Ход компьютера: " + Func.GetAddress(pnt));
@@ -92,9 +94,15 @@ namespace SeaBattle
                             else
                             {
                                 if (hum.GetbitShipStatus == 1)
+                                {
                                     Console.WriteLine("Ранен!");
+                                    Strat.SetStratOn(hum);
+                                }
                                 else
+                                {
                                     Console.WriteLine("Потоплен!");
+                                    Strat.SetStratOff();
+                                }
                             }
 
                         } while (retanswer > 0);
@@ -103,6 +111,11 @@ namespace SeaBattle
 
                if (GameOn)
                 {
+                    if (bil.GameOver)
+                        Console.WriteLine("Вы выграли! Поздравляю!\n");
+                    else
+                        Console.WriteLine("Компьтер выграл.\nВам нужно еще потренироваться!\n");
+
                     Console.Write("Играем еще (Y/N): ");
                     String answ = Console.ReadLine();
                     if (answ.ToLower() != "y") GameOn = false;

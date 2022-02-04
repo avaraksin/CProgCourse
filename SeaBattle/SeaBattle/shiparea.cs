@@ -84,7 +84,7 @@ namespace SeaBattle
 
         }
 
-        internal int ChekShoot(String spnt)
+        internal int CheckShoot(String spnt)
         {
             return CheckShoot(Func.GetPoint(spnt));
         }
@@ -125,6 +125,20 @@ namespace SeaBattle
             return 1;
         }
 
+        internal int CheckShootNoSet(int pnt)
+        {
+            if (pnt < 1 || pnt > 100) return -1;
+
+            if (printarea[pnt] > 1) return -1;
+
+            if (printarea[pnt] == 0)
+            {
+                return 0;
+            }
+
+            return 1;
+        }
+
         private void SetShipInArea(Ship ship)
         {
             for(int i = 0; i < ship.decksnum; i++)
@@ -132,5 +146,6 @@ namespace SeaBattle
                 printarea[ship.shiparea[i]] = 1;
             }
         }
+
     }
 }

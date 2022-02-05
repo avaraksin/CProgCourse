@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SeaBattle2
+namespace SeaButtle2
 {
-    internal class Game
+    public class Game
     {
     }
 }

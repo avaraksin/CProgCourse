@@ -9,15 +9,23 @@ namespace SeaButtle2
 {
     public enum FIELDSTATUS
     {
-        EMPTY = 0,
-        AWAY = 2,
-        DECK = 1,
-        SUNK = 3
+        EMPTY  = 0,
+        AWAY   = 2,
+        DECK   = 1,
+        SUNK   = 3
+    }
+    public enum PointStatus
+    {
+        ILLEGAL = -1,
+        AWAY = 0,
+        DECKSUCK = 1,
+        SHIPSUCK = 2
     }
     public class Field
     {
         public int[,] field;
         public List<Ship> ships;
+
         public Field()
         {
             ships = new List<Ship>();
@@ -26,11 +34,11 @@ namespace SeaButtle2
 
             for (int i = 4; i >= 1; i--)
             {
-                for (int k = 1; k <= i; k++)
+                for (int k = 4; k >= i; k--)
                 {
                     do
                     {
-                        ship = new Ship(k, (Orientation)new Random().Next(0, 2));
+                        ship = new Ship(i, (Orientation)new Random().Next(0, 2));
                         if (IsLegalShip(ship))
                         {
                             ships.Add(ship);
@@ -38,8 +46,9 @@ namespace SeaButtle2
                             {
                                 field[point.X, point.Y] = (int)FIELDSTATUS.DECK;
                             }
+                            break;
                         }
-                    } while (!IsLegalShip(ship));
+                    } while (true);
                 }
             }
 
@@ -78,25 +87,56 @@ namespace SeaButtle2
             return true;
         }
 
-        public void PrintArea()
+        private Ship GetShip(Point point)
         {
-            string[] fieldsp = new string[] { "\u2592", "\u2588", "\u25CF", "X" };
-            string[] fieldsb = new string[] { "\u2592", "\u2592", "\u25CF", "X" };
-
-            Console.WriteLine("  ABCDEFGHIJ");
-
-            string row;
-
-            for (int x = 1; x <= field.GetUpperBound(0); x++)
+            foreach (Ship ship in ships)
             {
-                row = x.ToString();
-                if (x < 10) row += " ";
-                for (int y = 1; y <= field.GetUpperBound(1); y++)
-                {
-                    row += fieldsp[field[x, y]];
-                }
-                Console.WriteLine(row);
+                if (ship.ShipArea().Contains(point)) return ship;
             }
+            return null;
         }
+
+        public PointStatus GetPointStatus(Point point)
+        {
+            if (point.isInvPoint || field[point.X, point.Y] == (int)FIELDSTATUS.AWAY || field[point.X, point.Y] == (int)FIELDSTATUS.SUNK)
+            {
+                return PointStatus.ILLEGAL;
+            }
+            else if (field[point.X, point.Y] == (int)FIELDSTATUS.EMPTY)
+            {
+                return PointStatus.AWAY;
+            }
+            else
+            {
+                Ship ship = GetShip(point);
+                if (ship == null) return PointStatus.ILLEGAL;
+
+                if (ship.decks == ship.decksuck + 1) return PointStatus.SHIPSUCK;
+            }
+
+            return PointStatus.DECKSUCK;
+        }
+
+        public PointStatus SetShoot(Point point)
+        {
+            PointStatus pointStatus = GetPointStatus(point);
+
+            switch (pointStatus)
+            {
+                case PointStatus.AWAY:
+                    field[point.X, point.Y] = (int)FIELDSTATUS.AWAY;
+                    break;
+
+                case PointStatus.ILLEGAL:
+                    break;
+
+                default:
+                    field[point.X, point.Y] = (int)FIELDSTATUS.SUNK;
+                    break;
+            }
+
+            return pointStatus;
+        }
+
     }
 }

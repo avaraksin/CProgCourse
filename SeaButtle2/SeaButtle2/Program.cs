@@ -12,7 +12,7 @@ namespace SeaButtle2
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Field field = new Field();
-            field.PrintArea();
+            new GamePresenter().PrintAreaWithShips(field.field);
             Console.ReadKey();
         }
     }

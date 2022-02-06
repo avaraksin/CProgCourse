@@ -9,18 +9,20 @@ namespace SeaButtle2
     public enum Orientation
     {
         HORIZONTAL = 0,
-        VERTICAL = 1
+        VERTICAL   = 1
     }
     public class Ship
     {
         public readonly int decks;
         public readonly Point coordinates;
         public readonly Orientation orientation;
+        public int decksuck;
         
         public Ship(int decks, Orientation orientation)
         {
             this.decks = decks;
             this.orientation = orientation;
+            decksuck = 0;
 
             do
             {

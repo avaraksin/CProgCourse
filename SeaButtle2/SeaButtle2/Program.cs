@@ -11,8 +11,9 @@ namespace SeaButtle2
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Field field = new Field();
-            new GamePresenter().PrintAreaWithShips(field.field);
+            Game game = new Game();
+            game.StartGame();
+            game.PlayGame();
             Console.ReadKey();
         }
     }

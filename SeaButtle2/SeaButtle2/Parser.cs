@@ -28,8 +28,8 @@ namespace SeaButtle2
             if (!int.TryParse(number, out inumber)) return point;
             if (inumber <= 0 || inumber > 10) return point;
 
-            point.X = literals.IndexOf(letter) + 1;
-            point.Y = inumber;
+            point.Y = literals.IndexOf(letter) + 1;
+            point.X = inumber;
 
             return point;
         }

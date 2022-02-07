@@ -18,5 +18,10 @@ namespace SeaButtle2
             }
             move = 0;
         }
+
+        public string SetMove()
+        {
+            return GamePresenter.GetStep();
+        }
     }
 }

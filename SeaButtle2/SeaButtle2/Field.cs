@@ -16,10 +16,10 @@ namespace SeaButtle2
     }
     public enum PointStatus
     {
-        ILLEGAL = -1,
-        AWAY = 0,
-        DECKSUCK = 1,
-        SHIPSUCK = 2
+        ILLEGAL     = -1,
+        AWAY        =  0,
+        DECKSUCK    =  1,
+        SHIPSUCK    =  2
     }
     public class Field
     {
@@ -132,6 +132,16 @@ namespace SeaButtle2
 
                 default:
                     field[point.X, point.Y] = (int)FIELDSTATUS.SUNK;
+                    GetShip(point).decksuck++;
+                    
+                    // Если корабль потоплен - выставляем точки вокруг него.
+                    if (pointStatus == PointStatus.SHIPSUCK) 
+                    {
+                        foreach ( Point pnt in FreeField(GetShip(point)) )
+                        {
+                            field[pnt.X, pnt.Y] = (int)FIELDSTATUS.AWAY;
+                        }
+                    }
                     break;
             }
 

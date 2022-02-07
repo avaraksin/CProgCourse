@@ -6,31 +6,37 @@ using System.Threading.Tasks;
 
 namespace SeaButtle2
 {
-    public class GamePresenter
+    public static class GamePresenter
     {
-            private string[] fieldsp = new string[] { "\u2592", "\u2588", "\u25CF", "X" };
-            private string[] fieldsb = new string[] { "\u2592", "\u2592", "\u25CF", "X" };
+            private static string[] fieldsp = new string[] { "\u2592", "\u2588", "\u25CF", "X" };
+            private static string[] fieldsb = new string[] { "\u2592", "\u2592", "\u25CF", "X" };
 
-        public GamePresenter()
-        {
-        }
-
-        public string GetStep()
+        public static string GetStep()
         {
             Console.Write("Ваш ход: ");
             return Console.ReadLine();
         }
 
-        public void PrintAreaWithShips(int[,] field)
+        public static void PrintAreaWithShips(int[,] field)
         {
             PrintArea(field, fieldsp);
         }
-        public void PrintAreaWithoutShips(int[,] field)
+        public static void PrintAreaWithoutShips(int[,] field)
         {
             PrintArea(field, fieldsb);
         }
 
-        private void PrintArea(int[,] field, string[] mask)
+        public static void PrintString(string message)
+        {
+            Console.WriteLine(message);
+        }
+
+        public static void PrintOverRow()
+        {
+            Console.WriteLine();
+        }
+
+        private static void PrintArea(int[,] field, string[] mask)
         {
             Console.WriteLine("  ABCDEFGHIJ");
 

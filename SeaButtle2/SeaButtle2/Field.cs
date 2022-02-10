@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace SeaButtle2
 {
@@ -31,6 +26,9 @@ namespace SeaButtle2
     /// </summary>
     public class Cell
     {
+        /// <summary>
+        /// Ссылка на корабль в ячейке, если null значит корабля тут нет
+        /// </summary>
         public Ship ship { get; }
 
         public Cell(Ship ship)
@@ -60,6 +58,7 @@ namespace SeaButtle2
 
         public Field()
         {
+            // todo это набросок цикла, доработать
             for (var i = 0; i < 4; i++)
             {
                 for (var j = 0; j < 4 - i; j++)

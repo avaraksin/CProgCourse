@@ -1,45 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeaButtle2
 {
-    public class Point : IEquatable<Point>
+    public class Point
     {
-        public int X;
-        public int Y;
+        public int X { get; }
+        public int Y { get; }
 
-        public bool isNullPoint { get { return (X == 0 && Y == 0); } }
-
-        public bool isInvPoint
+        /// <summary>
+        /// Конструктор класса Point по умолчанию возвращает точку со случайными координатами
+        /// </summary>
+        public Point()
         {
-            get
-            {
-                return X < 1 || X > 10 || Y < 1 || Y > 10;
-            }
+            X = new Random().Next(1, 11);
+            Y = new Random().Next(1, 11);
         }
 
-        public Point Random
-        {
-            get
-            {
-                return new Point( new Random().Next(1, 11), new Random().Next(1, 11) );
-            }
-        }
-
-        public Point() : this(0, 0) {}
-
+        /// <summary>
+        /// Конструктор класса Point
+        /// </summary>
+        /// <param name="X">Координата по оси ox</param>
+        /// <param name="Y">Координата по оси oy</param>
         public Point(int X, int Y)
         {
             this.X = X;
             this.Y = Y;
-        }
-
-        public bool Equals(Point point)
-        {
-            return X == point.X && Y == point.Y;
         }
 
         public override int GetHashCode()

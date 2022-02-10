@@ -6,48 +6,33 @@ using System.Threading.Tasks;
 
 namespace SeaButtle2
 {
-    public enum Orientation
+    public abstract class Ship
     {
-        HORIZONTAL = 0,
-        VERTICAL   = 1
-    }
-    public class Ship
-    {
-        public readonly int decks;
-        public readonly Point coordinates;
-        public readonly Orientation orientation;
-        public int decksuck;
+        public Point startPoint { get; set; }
+        public Orientation orientation { get; set; }
+        public string Name { get; set; }
+        public int decksNum { get; set; }
+        public bool Sunk { get; set; }
+        public DeckStatus[] Decks { get; set; }
+
+        public Ship(Point point, Orientation orientation, string name, int decksNum) {
         
-        public Ship(int decks, Orientation orientation)
-        {
-            this.decks = decks;
-            this.orientation = orientation;
-            decksuck = 0;
-
-            do
-            {
-                coordinates = new Point().Random;
-
-            } while (!CheckShip());
         }
 
-        public List<Point> ShipArea()
+        /// <summary>
+        /// Shot принять выстрел
+        /// </summary>
+        public void Shot()
         {
-            List<Point> shiparea = new List<Point>();
-            for(int i = 0; i < decks; i++)
-            {
-                Point point = new Point();
-                point.X = coordinates.X + (1 - (int)orientation) * i;
-                point.Y = coordinates.Y + (int)orientation * i;
 
-                shiparea.Add(point);
-            }
-            return shiparea;
         }
+    }
 
-        private bool CheckShip()
-        {
-            return !coordinates.isInvPoint && !ShipArea()[decks - 1].isInvPoint;
-        }
+    /// <summary>
+    /// TypicalShip - корабль как корабль
+    /// </summary>
+    public class TypicalShip : Ship
+    {
+        // TODO
     }
 }

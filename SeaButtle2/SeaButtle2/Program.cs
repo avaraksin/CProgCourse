@@ -10,11 +10,23 @@ namespace SeaButtle2
     {
         static void Main(string[] args)
         {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Game game = new Game();
-            game.StartGame();
-            game.PlayGame();
-            Console.ReadKey();
+            // todo
+            var player = new ManualPlayer(new Field());
+            var aiPlayer = new EasyBot(new Field());
+            var game = new Game(player, aiPlayer);
+            while(!game.Over) {
+                var input = Console.ReadLine();
+                string result;
+                try
+                {
+                    result = game.ParseAndExecuteCommand(input);
+                } catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                
+                Console.WriteLine();
+            }
         }
     }
 }

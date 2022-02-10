@@ -4,8 +4,7 @@ using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-// Test change git
-// Виктор был здесь и написал кое-что ещё 1234
+
 namespace test1
 {
     public class MyEnumerator : IEnumerator<int>

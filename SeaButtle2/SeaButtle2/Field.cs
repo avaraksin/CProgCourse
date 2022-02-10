@@ -7,146 +7,101 @@ using System.Threading.Tasks;
 
 namespace SeaButtle2
 {
-    public enum FIELDSTATUS
+    public enum ShootResult
     {
-        EMPTY  = 0,
-        AWAY   = 2,
-        DECK   = 1,
-        SUNK   = 3
+        MISS  = 0,
+        HIT   = 1,
+        SUNK   = 2
     }
-    public enum PointStatus
+
+    public enum DeckStatus
     {
-        ILLEGAL     = -1,
-        AWAY        =  0,
-        DECKSUCK    =  1,
-        SHIPSUCK    =  2
+        OK = 0,
+        SUNK = 1,
     }
+
+    public enum Orientation
+    {
+        HORIZONTAL = 0,
+        VERTICAL = 1,
+    }
+
+    /// <summary>
+    /// Cell ячейка поля, может содержать ссылку на корабль
+    /// </summary>
+    public class Cell
+    {
+        public Ship ship { get; }
+
+        public Cell(Ship ship)
+        {
+            this.ship = ship;
+        }
+
+        /// <summary>
+        /// Уже стреляли
+        /// </summary>
+        public bool Shot { get; set; }
+
+        /// <summary>
+        /// Находится рядом с кораблём - не стоит тут размещать другой корабль
+        /// </summary>
+        public bool NearShip { get; set; }
+    }
+
+    /// <summary>
+    /// Field игровое поле
+    /// Состоит из ячеек типа Cell, это сделано специально потому что в ячейках может быть ссылка на корабль, а может какое-то значение, например признак нахождения рядом с кораблём
+    /// </summary>
     public class Field
     {
-        public int[,] field;
+        public Cell[,] field;
         public List<Ship> ships;
 
         public Field()
         {
-            ships = new List<Ship>();
-            field = new int[11, 11];
-            Ship ship;
-
-            for (int i = 4; i >= 1; i--)
+            for (var i = 0; i < 4; i++)
             {
-                for (int k = 4; k >= i; k--)
+                for (var j = 0; j < 4 - i; j++)
                 {
-                    do
+                    var fits = false;
+                    while (!fits)
                     {
-                        ship = new Ship(i, (Orientation)new Random().Next(0, 2));
-                        if (IsLegalShip(ship))
+                        var ship = new Ship();
+
+                        foreach (var point in ship.GetCoordinates())
                         {
-                            ships.Add(ship);
-                            foreach (Point point in ship.ShipArea())
+                            var (x, y) = (point.X, point.Y);
+                            if (field[x, y].NearShip || field[x, y].ship != null)
                             {
-                                field[point.X, point.Y] = (int)FIELDSTATUS.DECK;
+                                continue;
                             }
-                            break;
-                        }
-                    } while (true);
-                }
-            }
 
-        }
-
-        public List<Point> FreeField(Ship ship)
-        {
-            List<Point> freeField = new List<Point>();
-
-            foreach (Point point in ship.ShipArea())
-            {
-                for (int x = -1; x <= 1; x++)
-                {
-                    for (int y = -1; y <= 1; y++)
-                    {
-                        Point pnt = new Point(point.X + x, point.Y + y);
-                        if ( !freeField.Contains(pnt) && !pnt.isInvPoint && !ship.ShipArea().Contains(pnt))
-                        {
-                            freeField.Add(pnt);
+                            fits = true;
                         }
                     }
+
                 }
             }
-            return freeField;
         }
 
-        public bool IsLegalShip(Ship ship)
+        public void Shot(Point point)
         {
-            foreach (Point point in ship.ShipArea())
-            {
-                foreach (Ship fieldship in ships)
-                {
-                    if (fieldship.ShipArea().Contains(point) || FreeField(fieldship).Contains(point)) return false;
-                }
+            var cell = field[point.X, point.Y];
+            // уже стреляли
+            if (cell.Shot) {
+                // todo
+                
             }
-            return true;
+
+            if (cell.ship == null)
+            {
+                cell.Shot = true;
+                
+            }
+
+            // в случае если корабль есть, подбиваем его
+            cell.ship.Shot();
         }
-
-        private Ship GetShip(Point point)
-        {
-            foreach (Ship ship in ships)
-            {
-                if (ship.ShipArea().Contains(point)) return ship;
-            }
-            return null;
-        }
-
-        public PointStatus GetPointStatus(Point point)
-        {
-            if (point.isInvPoint || field[point.X, point.Y] == (int)FIELDSTATUS.AWAY || field[point.X, point.Y] == (int)FIELDSTATUS.SUNK)
-            {
-                return PointStatus.ILLEGAL;
-            }
-            else if (field[point.X, point.Y] == (int)FIELDSTATUS.EMPTY)
-            {
-                return PointStatus.AWAY;
-            }
-            else
-            {
-                Ship ship = GetShip(point);
-                if (ship == null) return PointStatus.ILLEGAL;
-
-                if (ship.decks == ship.decksuck + 1) return PointStatus.SHIPSUCK;
-            }
-
-            return PointStatus.DECKSUCK;
-        }
-
-        public PointStatus SetShoot(Point point)
-        {
-            PointStatus pointStatus = GetPointStatus(point);
-
-            switch (pointStatus)
-            {
-                case PointStatus.AWAY:
-                    field[point.X, point.Y] = (int)FIELDSTATUS.AWAY;
-                    break;
-
-                case PointStatus.ILLEGAL:
-                    break;
-
-                default:
-                    field[point.X, point.Y] = (int)FIELDSTATUS.SUNK;
-                    GetShip(point).decksuck++;
-                    
-                    // Если корабль потоплен - выставляем точки вокруг него.
-                    if (pointStatus == PointStatus.SHIPSUCK) 
-                    {
-                        foreach ( Point pnt in FreeField(GetShip(point)) )
-                        {
-                            field[pnt.X, pnt.Y] = (int)FIELDSTATUS.AWAY;
-                        }
-                    }
-                    break;
-            }
-
-            return pointStatus;
-        }
-
     }
 }

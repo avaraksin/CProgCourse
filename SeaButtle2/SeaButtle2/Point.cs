@@ -17,7 +17,7 @@ namespace SeaButtle2
         {
             get
             {
-                return X < 1 || X > 10 || Y < 1 || Y > 10;
+                return X < 1 || X > Field.SIZE || Y < 1 || Y > Field.SIZE;
             }
         }
 
@@ -25,7 +25,7 @@ namespace SeaButtle2
         {
             get
             {
-                return new Point( new Random().Next(1, 11), new Random().Next(1, 11) );
+                return new Point( new Random().Next(1, Field.SIZE + 1), new Random().Next(1, Field.SIZE + 1) );
             }
         }
 

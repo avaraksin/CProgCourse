@@ -28,7 +28,7 @@ namespace SeaButtle2
             {
                 coordinates = new Point().Random;
 
-            } while (!CheckShip());
+            } while (!CheckShip()); // вторая проверка, убрать
         }
 
         public List<Point> ShipArea()

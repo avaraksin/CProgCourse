@@ -6,22 +6,16 @@ using System.Threading.Tasks;
 
 namespace SeaButtle2
 {
-    public class Player
+    public abstract class Player
     {
         public int move;
         public Field field;
         public Player()
         {
-            if (field == null)
-            {
-                field = new Field();
-            }
+            field = new Field();
             move = 0;
         }
 
-        public string SetMove()
-        {
-            return GamePresenter.GetStep();
-        }
+        public abstract PointStatus DoMove(Player player, Point point);
     }
 }

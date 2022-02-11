@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace SeaButtle2
 {
-    public static class GamePresenter
+    public class GamePresenter
     {
             private static string[] fieldsp = new string[] { "\u2592", "\u2588", "\u25CF", "X" };
             private static string[] fieldsb = new string[] { "\u2592", "\u2592", "\u25CF", "X" };
+
 
         public static string GetStep()
         {

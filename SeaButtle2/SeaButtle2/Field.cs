@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace SeaButtle2
 {
+   
     public enum FIELDSTATUS
     {
         EMPTY  = 0,
@@ -21,24 +22,26 @@ namespace SeaButtle2
         DECKSUCK    =  1,
         SHIPSUCK    =  2
     }
+    
     public class Field
     {
+        public static int SIZE = 10;
+
         public int[,] field;
         public List<Ship> ships;
 
         public Field()
         {
             ships = new List<Ship>();
-            field = new int[11, 11];
-            Ship ship;
+            field = new int[SIZE + 1, SIZE + 1];
 
             for (int i = 4; i >= 1; i--)
             {
                 for (int k = 4; k >= i; k--)
                 {
-                    do
+                    while (true)
                     {
-                        ship = new Ship(i, (Orientation)new Random().Next(0, 2));
+                        Ship ship = new Ship(i, (Orientation)new Random().Next(0, 2));
                         if (IsLegalShip(ship))
                         {
                             ships.Add(ship);
@@ -48,7 +51,7 @@ namespace SeaButtle2
                             }
                             break;
                         }
-                    } while (true);
+                    }
                 }
             }
 

@@ -6,7 +6,7 @@ namespace SeaButtle2
  /// <summary>
     /// Player абстрактный класс игрока, все действующие лица должны наследоваться от него
     /// </summary>
-    public abstract class Player
+    public class Player
     {
         private int id;
         private List<Player> enemies;
@@ -50,7 +50,7 @@ namespace SeaButtle2
         /// GetShot принять вражеский выстрел
         /// </summary>
         /// <param name="point"></param>
-        public void GetShot(Point point)
+        public ShootResult GetShot(Point point)
         {
             // здесь обработка выстрела по полю field игрока
             // если игрок проиграл, здесь должно выставляться состояние

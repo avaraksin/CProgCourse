@@ -7,13 +7,21 @@ namespace SeaButtle2
         public int X { get; }
         public int Y { get; }
 
+        public bool isLegal
+        {
+            get
+            {
+                return X > 0 && Y > 0 && X <= Field.SIZE && Y <= Field.SIZE;
+            }
+        }
+
         /// <summary>
         /// Конструктор класса Point по умолчанию возвращает точку со случайными координатами
         /// </summary>
         public Point()
         {
-            X = new Random().Next(1, 11);
-            Y = new Random().Next(1, 11);
+            X = new Random().Next(1, Field.SIZE + 1);
+            Y = new Random().Next(1, Field.SIZE + 1);
         }
 
         /// <summary>

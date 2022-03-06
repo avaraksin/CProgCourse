@@ -25,7 +25,7 @@ namespace SeaButtle2
                     Console.WriteLine(ex.ToString());
                 }
                 
-                Console.WriteLine();
+                Console.WriteLine(result);
             }
         }
     }

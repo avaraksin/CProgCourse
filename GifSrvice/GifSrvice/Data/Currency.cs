@@ -1,4 +1,6 @@
-﻿namespace GifSrvice.Data
+﻿using Newtonsoft.Json;
+
+namespace GifSrvice.Data
 {
     public class Currency
     {
@@ -11,26 +13,24 @@
             this.Base = "USD";
             this.symbols = "RUB";
         }
-
-        public Currency(string? Base, string? symbols)
-        {
-            this.Base = Base;
-            this.symbols = symbols;
-        }
     }
 
-    public class Cur_Report
+    public class CurReport
     {
+        [JsonProperty("disclaimer")]
         public string? disclaimer;
-        //public string? license;
-        //public string? timestamp;
-        //public string? _base;
-        //public Rates? rates;
+        [JsonProperty("license")]
+        public string? license;
+        [JsonProperty("timestamp")]
+        public string? timestamp;
+        [JsonProperty("base")]
+        public string? Base;
+        public Rates? rates;
     }
 
     public class Rates
     {
-        public string? curname;
-        public float value;
+        [JsonProperty("RUB")]
+        public float RUB;
     }
 }

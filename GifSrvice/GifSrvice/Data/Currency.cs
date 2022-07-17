@@ -25,12 +25,13 @@ namespace GifSrvice.Data
         public string? timestamp;
         [JsonProperty("base")]
         public string? Base;
+        [JsonProperty("rates")]
         public Rates? rates;
     }
 
     public class Rates
     {
         [JsonProperty("RUB")]
-        public float RUB;
+        public float value;
     }
 }

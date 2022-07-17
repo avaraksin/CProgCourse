@@ -38,7 +38,7 @@ namespace GifSrvice.BussinessLogik
 
         public int DynRates()
         {
-            return GetRate(DateTime.Now).rates.RUB >= GetRate(DateTime.Now.AddDays(-1)).rates.RUB ? 1 : 0;
+            return GetRate(DateTime.Now).rates.value >= GetRate(DateTime.Now.AddDays(-1)).rates.value ? 1 : 0;
         }
     }
 }

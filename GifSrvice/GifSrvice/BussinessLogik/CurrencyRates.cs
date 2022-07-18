@@ -1,23 +1,23 @@
-﻿using GifSrvice.Data;
+﻿using GifSrvice.Controllers;
+using GifSrvice.Data;
 using Newtonsoft.Json;
 
 
 namespace GifSrvice.BussinessLogik
 {
-    public class CurrencyRates
+    public class CurrencyRates: ICurrencyRates
     {
-        static string path = "https://openexchangerates.org/api/historical/";
+        private IHttpClientFactory _httpClientFactory;
+
+        static string path = $"https://openexchangerates.org/api/historical/";
         static string pathTool = ".json";
-        static HttpClient client = new HttpClient();
+
         public static CurrencyRates instance;
+
             
-        public static CurrencyRates GetInstance()
+        public CurrencyRates(IHttpClientFactory clientFactory)
         {
-            if (instance == null)
-            {
-                instance = new CurrencyRates();
-            }
-            return instance;
+            _httpClientFactory = clientFactory;
         }
 
         public CurReport GetRate(DateTime date)
@@ -29,6 +29,9 @@ namespace GifSrvice.BussinessLogik
             fulpath += "?app_id=" + currency.app_id;
             fulpath += ";symbols=" + currency.symbols;
             fulpath += ";base=" + currency.Base;
+
+            //var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+            var client = _httpClientFactory.CreateClient();
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, fulpath);
             HttpResponseMessage response = client.Send(request);

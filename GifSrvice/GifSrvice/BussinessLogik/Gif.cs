@@ -10,8 +10,6 @@ namespace GifSrvice.BussinessLogik
 
         private static Gif? instance;
 
-        static HttpClient client = new HttpClient();
-
         public static Gif GetInstance()
         {
             if (instance == null)
@@ -29,6 +27,10 @@ namespace GifSrvice.BussinessLogik
             fulpath += ";rating=g";
 
             fulpath = $"https://api.giphy.com/v1/gifs/random?api_key=GTRyejAYZqD0cfjcbjh74d8V6tfY0YEK&tag=" + param + $"&rating=g";
+
+            var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+            var httpClientFactory = serviceProvider.GetService<IHttpClientFactory>();
+            var client = httpClientFactory.CreateClient();
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, fulpath);
             HttpResponseMessage response = client.Send(request);

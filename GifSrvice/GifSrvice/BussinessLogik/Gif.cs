@@ -5,19 +5,15 @@ namespace GifSrvice.BussinessLogik
 {
     public class Gif
     {
-        private static string app_id = "GTRyejAYZqD0cfjcbjh74d8V6tfY0YEK";
-        private static string url = "https://api.giphy.com/v1/gifs/random?";
+        private IHttpClientFactory _httpClientFactory;
 
         private static Gif? instance;
 
-        public static Gif GetInstance()
+        public Gif(IHttpClientFactory httpClientFactory)
         {
-            if (instance == null)
-            {
-                instance = new Gif();
-            }
-            return instance;
+            _httpClientFactory = httpClientFactory;
         }
+        
 
         public Gifdata GetImage(string param)
         {

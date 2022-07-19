@@ -1,5 +1,6 @@
 using GifSrvice.BussinessLogik;
 using GifSrvice.Controllers;
+using GifSrvice.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
-builder.Services.AddSingleton<ICurrencyRates, CurrencyRates>();
+
+//builder.Services.AddSingleton<ICurrencyRates, CurrencyRates>();
+//builder.Services.AddSingleton<IGif, Gif>();
+
 
 var app = builder.Build();
 

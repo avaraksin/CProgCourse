@@ -1,5 +1,6 @@
 ﻿using GifSrvice.Controllers;
 using GifSrvice.Data;
+using GifSrvice.Interface;
 using Newtonsoft.Json;
 
 

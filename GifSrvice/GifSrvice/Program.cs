@@ -12,6 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
+builder.Services.AddScoped<ICurrencyRates, CurrencyRates>();
+builder.Services.AddScoped<IGif, Gif>();
+
 //builder.Services.AddSingleton<ICurrencyRates, CurrencyRates>();
 //builder.Services.AddSingleton<IGif, Gif>();
 

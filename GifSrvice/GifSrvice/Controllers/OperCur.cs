@@ -19,10 +19,10 @@ namespace GifSrvice.Controllers
         private static int dayShift = -1;
 
 
-        public OperCurController(IHttpClientFactory httpClientFactory)
+        public OperCurController(IGif gif, ICurrencyRates currencyRates)
         {
-            _currencyRates = new CurrencyRates(httpClientFactory);
-            _gif = new Gif(httpClientFactory);
+            _currencyRates = currencyRates;
+            _gif = gif;
         }
 
         // GET: api/rate

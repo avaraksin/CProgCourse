@@ -15,6 +15,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<ICurrencyRates, CurrencyRates>();
 builder.Services.AddScoped<IGif, Gif>();
 
+builder.Services.AddHttpContextAccessor();
+
 //builder.Services.AddSingleton<ICurrencyRates, CurrencyRates>();
 //builder.Services.AddSingleton<IGif, Gif>();
 

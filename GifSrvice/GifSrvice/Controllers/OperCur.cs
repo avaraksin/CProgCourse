@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using GifSrvice.Data;
 using GifSrvice.BussinessLogik;
 using GifSrvice.Interface;
+using System.Text;
 
 // JsonConvert.SerializeObject
 
@@ -15,14 +17,19 @@ namespace GifSrvice.Controllers
     {
         private ICurrencyRates _currencyRates;
         private IGif _gif;
+        private IHttpClientFactory _httpClientFactory;
 
         private static int dayShift = -1;
 
+        private HttpContext? ctx;
 
-        public OperCurController(IGif gif, ICurrencyRates currencyRates)
+
+        public OperCurController(IGif gif, ICurrencyRates currencyRates, IHttpClientFactory httpClientFactory, IHttpContextAccessor cx)
         {
             _currencyRates = currencyRates;
             _gif = gif;
+            _httpClientFactory = httpClientFactory;
+            ctx = cx.HttpContext;
         }
 
         // GET: api/rate
@@ -45,18 +52,38 @@ namespace GifSrvice.Controllers
         // GET: api/image
         [HttpGet]
         [Route("image")]
-        public ContentResult GetImage()
+        public IActionResult GetImage()
         {
             string image = _currencyRates.DynRates() == 1 ?
                 _gif.GetGifUrl(_gif.GetImage("money")) : 
                 _gif.GetGifUrl(_gif.GetImage("no money"));
 
-            return new ContentResult
-            {
-                ContentType = "text/html",
-                Content = $"<img src = \"" + image + "\">\n"
-            };
-                        
+            
+
+            var client = _httpClientFactory.CreateClient();
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, image);
+            HttpResponseMessage response = client.Send(request);
+
+            return null;
+        }
+
+        [HttpGet]
+        [Route("testbody")]
+        public void TestBody()
+        {
+            ctx.Response.StatusCode = 200;
+            //Set Content Type
+            ctx.Response.ContentType = "plain/text";
+            //Create Response
+            ctx.Response.Headers.Add("SomeHeader", "Value");
+            byte[] content = Encoding.ASCII.GetBytes($"This id BODY");
+            //Send it to the Client
+            ctx.Response.Body.WriteAsync(content, 0, content.Length);
+           
+
+            return ;
         }
     }
+
+    
 }

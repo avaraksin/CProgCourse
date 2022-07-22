@@ -52,19 +52,26 @@ namespace GifSrvice.Controllers
         // GET: api/image
         [HttpGet]
         [Route("image")]
-        public IActionResult GetImage()
+        public ContentResult GetImage()
         {
-            string image = _currencyRates.DynRates() == 1 ?
-                _gif.GetGifUrl(_gif.GetImage("money")) : 
-                _gif.GetGifUrl(_gif.GetImage("no money"));
+            //string image = _currencyRates.DynRates() == 1 ?
+            //    _gif.GetGifUrl(_gif.GetImage("money")) : 
+            //    _gif.GetGifUrl(_gif.GetImage("no money"));
 
-            
+            string image = "https://media2.giphy.com/media/xUA7b89FQKbHOZp7fW/giphy.gif?cid=33cf7daed5d61c0ded72cdf8d1f859bbc15c2a333b68e177&rid=giphy.gif&ct=g";
 
             var client = _httpClientFactory.CreateClient();
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, image);
             HttpResponseMessage response = client.Send(request);
+            var stream = response.Content.ReadAsStreamAsync().Result;
+            MemoryStream memoryStream = new MemoryStream();
+            var returnstring =new StreamReader(memoryStream, Encoding.ASCII);
 
-            return null;
+            return new ContentResult
+            {
+                ContentType = "image/gif",
+                Content = returnstring.ReadToEnd()
+            };
         }
 
         [HttpGet]
@@ -81,7 +88,7 @@ namespace GifSrvice.Controllers
             ctx.Response.Body.WriteAsync(content, 0, content.Length);
            
 
-            return ;
+            return;
         }
     }
 

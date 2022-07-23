@@ -39,30 +39,28 @@ namespace GifSrvice.Controllers
         public string GetRate()
         {
             float nowRate = _currencyRates.GetRate(DateTime.Now).rates.value;
-            float beforeRate  = _currencyRates.GetRate(DateTime.Now.AddDays(dayShift)).rates.value;
-            
-            string text = "Курс рубля к доллару на сегодня (" + DateTime.Now.ToString("dd.MM.yyyy") + ") = " +
-                    nowRate.ToString();
-            text += $"\nКурс рубля к доллару на " + DateTime.Now.AddDays(dayShift).ToString("dd.MM.yyyy") + " = " +
-                    beforeRate.ToString();
-            text += $"\nРазница = " + (nowRate - beforeRate).ToString() + $"\nФункция вернула ";
-            return text + _currencyRates.DynRates().ToString();            
+            float beforeRate = _currencyRates.GetRate(DateTime.Now.AddDays(dayShift)).rates.value;
+
+            var text = $"Курс рубля к доллару на сегодня ({DateTime.Now.ToString("dd.MM.yyyy")}) = {nowRate.ToString()}";
+            text += $"\nКурс рубля к доллару на {DateTime.Now.AddDays(dayShift).ToString("dd.MM.yyyy")} = {beforeRate.ToString()}";
+            text += $"\nРазница = {(nowRate - beforeRate).ToString()}\nФункция вернула ";
+            return $"{text}{_currencyRates.IsCurrencyRiseFromYesterday().ToString()}";            
         }
         
         // GET: api/image
         [HttpGet]
         [Route("image")]
-        public IActionResult GetImage()
+        public async Task<IActionResult> GetImage()
         {
-            string image = _currencyRates.DynRates() == 1 ?
+            var image = _currencyRates.IsCurrencyRiseFromYesterday() == 1 ?
                 _gif.GetGifUrl(_gif.GetImage("money")) :
                 _gif.GetGifUrl(_gif.GetImage("no money"));
             
             var client = _httpClientFactory.CreateClient();
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, image);
-            HttpResponseMessage response = client.Send(request);
+            var request = new HttpRequestMessage(HttpMethod.Get, image);
+            var response = client.Send(request);
             
-            Byte[] buffer = response.Content.ReadAsByteArrayAsync().Result;
+            var buffer = await response.Content.ReadAsByteArrayAsync();
 
             return File(buffer, "image/gif");
         }

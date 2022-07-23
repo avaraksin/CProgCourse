@@ -1,6 +1,7 @@
 ﻿using GifSrvice.Data;
 using GifSrvice.Interface;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.WebUtilities;
 
 namespace GifSrvice.BussinessLogik
 {
@@ -15,13 +16,18 @@ namespace GifSrvice.BussinessLogik
         
         public Gifdata GetImage(string param)
         {
-            string fulpath;
+            string fullpath = $"https://api.giphy.com/v1/gifs/random";
 
-            fulpath = $"https://api.giphy.com/v1/gifs/random?api_key=GTRyejAYZqD0cfjcbjh74d8V6tfY0YEK&tag=" + param + $"&rating=g";
+            Dictionary<string, string?> uriDict = new Dictionary<string, string?>();
+            uriDict.Add("api_key", @"GTRyejAYZqD0cfjcbjh74d8V6tfY0YEK");
+            uriDict.Add("tag", $"{param}");
+            uriDict.Add("rating", "g");
+
+            fullpath = QueryHelpers.AddQueryString(fullpath, uriDict);
 
             var client = _httpClientFactory.CreateClient();
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, fulpath);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, fullpath);
             HttpResponseMessage response = client.Send(request);
 
             return JsonConvert.DeserializeObject<Gifdata>(response.Content.ReadAsStringAsync().Result);

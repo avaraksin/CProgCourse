@@ -2,6 +2,7 @@
 using GifSrvice.Data;
 using GifSrvice.Interface;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.WebUtilities;
 
 
 namespace GifSrvice.BussinessLogik
@@ -10,37 +11,38 @@ namespace GifSrvice.BussinessLogik
     {
         private IHttpClientFactory _httpClientFactory;
 
-        static string path = $"https://openexchangerates.org/api/historical/";
+        static string exchangeRatesUrl = $"https://openexchangerates.org/api/historical/";
         static string pathTool = ".json";
 
-        public static CurrencyRates instance;
-
-            
         public CurrencyRates(IHttpClientFactory clientFactory)
         {
             _httpClientFactory = clientFactory;
         }
 
-        public CurReport GetRate(DateTime date)
+        public async Task<CurReport> GetRate(DateTime date)
         {
             Currency currency = new Currency();
-            
-            string fulpath = path + date.ToString("yyyy-MM-dd") + pathTool;
-            
-            fulpath += "?app_id=" + currency.app_id;
-            fulpath += ";symbols=" + currency.symbols;
-            fulpath += ";base=" + currency.Base;
 
-            //var serviceProvider = new ServiceCollection().AddHttpClient().BuildServiceProvider();
+            string fullpathUri = $"{exchangeRatesUrl}{date.ToString("yyyy-MM-dd")}{pathTool}";
+
+            Dictionary<string, string?> parameters = new ()
+            {
+                { "app_id",     currency.app_id     },
+                { "symbols",    currency.symbols    },
+                { "base",       currency.Base       }
+            };
+            
+            fullpathUri = QueryHelpers.AddQueryString(fullpathUri, parameters);
+
             var client = _httpClientFactory.CreateClient();
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, fulpath);
-            HttpResponseMessage response = client.Send(request);
+            var request = new HttpRequestMessage(HttpMethod.Get, fullpathUri);
+            var response = client.Send(request);
             
-            return JsonConvert.DeserializeObject<CurReport>(response.Content.ReadAsStringAsync().Result);
+            return JsonConvert.DeserializeObject<CurReport>(await response.Content.ReadAsStringAsync());
         }
 
-        public int DynRates()
+        public int IsCurrencyRiseFromYesterday()
         {
             return GetRate(DateTime.Now).rates.value >= GetRate(DateTime.Now.AddDays(-1)).rates.value ? 1 : 0;
         }

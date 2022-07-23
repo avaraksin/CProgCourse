@@ -42,9 +42,9 @@ namespace GifSrvice.BussinessLogik
             return JsonConvert.DeserializeObject<CurReport>(await response.Content.ReadAsStringAsync());
         }
 
-        public int IsCurrencyRiseFromYesterday()
+        public async Task<int> IsCurrencyRiseFromYesterday()
         {
-            return GetRate(DateTime.Now).rates.value >= GetRate(DateTime.Now.AddDays(-1)).rates.value ? 1 : 0;
+            return (await GetRate(DateTime.Now)).rates.value >= (await GetRate(DateTime.Now.AddDays(-1))).rates.value ? 1 : 0;
         }
     }
 }

@@ -36,10 +36,10 @@ namespace GifSrvice.Controllers
 
         [HttpGet]
         [Route("rate")]
-        public string GetRate()
+        public async Task<string> GetRate()
         {
-            float nowRate = _currencyRates.GetRate(DateTime.Now).rates.value;
-            float beforeRate = _currencyRates.GetRate(DateTime.Now.AddDays(dayShift)).rates.value;
+            float nowRate = (await _currencyRates.GetRate(DateTime.Now)).rates.value;
+            float beforeRate = (await _currencyRates.GetRate(DateTime.Now.AddDays(dayShift))).rates.value;
 
             var text = $"Курс рубля к доллару на сегодня ({DateTime.Now.ToString("dd.MM.yyyy")}) = {nowRate.ToString()}";
             text += $"\nКурс рубля к доллару на {DateTime.Now.AddDays(dayShift).ToString("dd.MM.yyyy")} = {beforeRate.ToString()}";
@@ -52,7 +52,7 @@ namespace GifSrvice.Controllers
         [Route("image")]
         public async Task<IActionResult> GetImage()
         {
-            var image = _currencyRates.IsCurrencyRiseFromYesterday() == 1 ?
+            var image = (await _currencyRates.IsCurrencyRiseFromYesterday()) == 1 ?
                 _gif.GetGifUrl(_gif.GetImage("money")) :
                 _gif.GetGifUrl(_gif.GetImage("no money"));
             

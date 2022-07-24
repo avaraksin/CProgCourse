@@ -11,19 +11,19 @@ namespace GifSrvice.BussinessLogik
     {
         private IHttpClientFactory _httpClientFactory;
 
-        static string exchangeRatesUrl = $"https://openexchangerates.org/api/historical/";
-        static string pathTool = ".json";
+        private readonly string  exchangeRatesUrl = $"https://openexchangerates.org/api/historical/";
+        private readonly string pathTool = ".json";
 
         public CurrencyRates(IHttpClientFactory clientFactory)
         {
             _httpClientFactory = clientFactory;
         }
 
-        public async Task<CurReport> GetRate(DateTime date)
+        public async Task<CurReport?> GetRate(DateTime date)
         {
-            Currency currency = new Currency();
+            var currency = new Currency();
 
-            string fullpathUri = $"{exchangeRatesUrl}{date.ToString("yyyy-MM-dd")}{pathTool}";
+            var fullpathUri = $"{exchangeRatesUrl}{date.ToString("yyyy-MM-dd")}{pathTool}";
 
             Dictionary<string, string?> parameters = new ()
             {
@@ -39,12 +39,12 @@ namespace GifSrvice.BussinessLogik
             var request = new HttpRequestMessage(HttpMethod.Get, fullpathUri);
             var response = client.Send(request);
             
-            return JsonConvert.DeserializeObject<CurReport>(await response.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<CurReport?>(await response.Content.ReadAsStringAsync());
         }
 
         public async Task<int> IsCurrencyRiseFromYesterday()
         {
-            return (await GetRate(DateTime.Now)).rates.value >= (await GetRate(DateTime.Now.AddDays(-1))).rates.value ? 1 : 0;
+            return (await GetRate(DateTime.Now))?.rates?.value >= (await GetRate(DateTime.Now.AddDays(-1)))?.rates?.value ? 1 : 0;
         }
     }
 }

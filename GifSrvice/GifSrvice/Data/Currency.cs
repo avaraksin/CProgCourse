@@ -32,6 +32,6 @@ namespace GifSrvice.Data
     public class Rates
     {
         [JsonProperty("RUB")]
-        public float value;
+        public float? value;
     }
 }

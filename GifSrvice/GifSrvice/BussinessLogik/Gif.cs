@@ -13,15 +13,17 @@ namespace GifSrvice.BussinessLogik
         {
             _httpClientFactory = httpClientFactory;
         }
-        
-        public Gifdata GetImage(string param)
-        {
-            string fullpath = $"https://api.giphy.com/v1/gifs/random";
 
-            Dictionary<string, string?> uriDict = new Dictionary<string, string?>();
-            uriDict.Add("api_key", @"GTRyejAYZqD0cfjcbjh74d8V6tfY0YEK");
-            uriDict.Add("tag", $"{param}");
-            uriDict.Add("rating", "g");
+        public async Task<Gifdata?> GetImage(string? param)
+        {
+            var fullpath = $"https://api.giphy.com/v1/gifs/random";
+
+            Dictionary<string, string?> uriDict = new()
+            {
+                { "api_key", @"GTRyejAYZqD0cfjcbjh74d8V6tfY0YEK" },
+                { "tag",     param },
+                { "rating",  "g" }
+            };
 
             fullpath = QueryHelpers.AddQueryString(fullpath, uriDict);
 
@@ -30,10 +32,10 @@ namespace GifSrvice.BussinessLogik
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, fullpath);
             HttpResponseMessage response = client.Send(request);
 
-            return JsonConvert.DeserializeObject<Gifdata>(response.Content.ReadAsStringAsync().Result);
+            return JsonConvert.DeserializeObject<Gifdata>(await response.Content.ReadAsStringAsync());
         }
 
-        public string GetGifUrl(Gifdata gifdata)
+        public string? GetGifUrl(Gifdata? gifdata)
         {
                 return gifdata?.data?.images?.preview?.mp4;
         }

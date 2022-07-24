@@ -5,7 +5,7 @@ namespace GifSrvice.Interface
 {
     public interface ICurrencyRates
     {
-        Task<CurReport> GetRate(DateTime date);
+        Task<CurReport?> GetRate(DateTime date);
         public Task<int> IsCurrencyRiseFromYesterday();
     }
 }

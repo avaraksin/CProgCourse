@@ -16,7 +16,7 @@ namespace GifSrvice.Controllers
     public class OperCurController : ControllerBase
     {
         private ICurrencyRates _currencyRates;
-        private IGif _gif;
+        private IGif? _gif;
         private IHttpClientFactory _httpClientFactory;
 
         private static int dayShift = -1;
@@ -38,13 +38,14 @@ namespace GifSrvice.Controllers
         [Route("rate")]
         public async Task<string> GetRate()
         {
-            float nowRate = (await _currencyRates.GetRate(DateTime.Now)).rates.value;
-            float beforeRate = (await _currencyRates.GetRate(DateTime.Now.AddDays(dayShift))).rates.value;
+            float? nowRate = (await _currencyRates.GetRate(DateTime.Now))?.rates?.value;
+            float? beforeRate = (await _currencyRates.GetRate(DateTime.Now.AddDays(dayShift)))?.rates?.value;
 
-            var text = $"Курс рубля к доллару на сегодня ({DateTime.Now.ToString("dd.MM.yyyy")}) = {nowRate.ToString()}";
-            text += $"\nКурс рубля к доллару на {DateTime.Now.AddDays(dayShift).ToString("dd.MM.yyyy")} = {beforeRate.ToString()}";
-            text += $"\nРазница = {(nowRate - beforeRate).ToString()}\nФункция вернула ";
-            return $"{text}{_currencyRates.IsCurrencyRiseFromYesterday().ToString()}";            
+            var text = $"Курс рубля к доллару на сегодня ({DateTime.Now.ToString("dd.MM.yyyy")}) = {nowRate:F2}";
+            text += $"\nКурс рубля к доллару на {DateTime.Now.AddDays(dayShift).ToString("dd.MM.yyyy")} = {beforeRate:F2}";
+            text += $"\nРазница = {(nowRate - beforeRate):F2}";
+            text += $"\nФункция вернула {await _currencyRates.IsCurrencyRiseFromYesterday()}";
+            return text;            
         }
         
         // GET: api/image
@@ -52,9 +53,9 @@ namespace GifSrvice.Controllers
         [Route("image")]
         public async Task<IActionResult> GetImage()
         {
-            var image = (await _currencyRates.IsCurrencyRiseFromYesterday()) == 1 ?
-                _gif.GetGifUrl(_gif.GetImage("money")) :
-                _gif.GetGifUrl(_gif.GetImage("no money"));
+            var imageSearchName = (await _currencyRates.IsCurrencyRiseFromYesterday()) == 1 ? "rich" : "broke";
+
+            var image = _gif?.GetGifUrl(await _gif?.GetImage(imageSearchName));
             
             var client = _httpClientFactory.CreateClient();
             var request = new HttpRequestMessage(HttpMethod.Get, image);

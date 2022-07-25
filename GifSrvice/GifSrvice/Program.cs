@@ -30,7 +30,8 @@ builder.Services.AddHttpContextAccessor();
 
 //var confBuilder = new ConfigurationBuilder().AddJsonFile("json.json"); 
 //IConfiguration AppConfiguration = confBuilder.Build();
-//builder.Services.Configure<GifServiceSettings>(AppConfiguration);
+builder.Services.Configure<GifServiceSettings>(builder.Configuration.GetSection("GifServiceSettings"));
+builder.Services.Configure<Currency>(builder.Configuration.GetSection("Currency"));
 
 var app = builder.Build();
 

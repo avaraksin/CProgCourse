@@ -3,6 +3,8 @@ using GifSrvice.Data;
 using GifSrvice.Interface;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
+
 
 
 namespace GifSrvice.BussinessLogik
@@ -10,18 +12,16 @@ namespace GifSrvice.BussinessLogik
     public class CurrencyRates: ICurrencyRates
     {
         private IHttpClientFactory _httpClientFactory;
-        private IConfiguration _configuration;
+        private readonly Currency currency;
 
-        public CurrencyRates(IHttpClientFactory clientFactory, IConfiguration configuration)
+        public CurrencyRates(IHttpClientFactory clientFactory, IOptions<Currency> configuration)
         {
             _httpClientFactory = clientFactory;
-            _configuration = configuration;
+            currency = configuration.Value;
         }
 
         public async Task<CurReport?> GetRate(DateTime date)
         {
-            var currency = _configuration.GetSection("Currency").Get<Currency>();
-
             var fullpathUri = $"{currency.url}{date.ToString("yyyy-MM-dd")}{currency.pathTool}";
 
             Dictionary<string, string?> parameters = new ()

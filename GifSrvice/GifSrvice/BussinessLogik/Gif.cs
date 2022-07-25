@@ -9,18 +9,17 @@ namespace GifSrvice.BussinessLogik
     public class Gif : IGif
     {
         private IHttpClientFactory _httpClientFactory;
-        private IConfiguration _configuration { get; }
 
-        public Gif(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        private readonly GifServiceSettings settings;
+
+        public Gif(IHttpClientFactory httpClientFactory, IOptions<GifServiceSettings> configuration)
         {
             _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
+            settings = configuration.Value;
         }
 
         public async Task<Gifdata?> GetImage(string? param)
         {
-            var settings = _configuration.GetSection("GifServiceSettings").Get<GifServiceSettings>();
-
             var fullpath = settings.url;
 
             Dictionary<string, string?> uriDict = new()

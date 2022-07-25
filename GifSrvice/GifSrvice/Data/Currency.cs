@@ -4,15 +4,16 @@ namespace GifSrvice.Data
 {
     public class Currency
     {
-        public string app_id = "eac80a2c15f84765baa70420b28c6a88";
-        public string? Base;
-        public string? symbols;
-
-        public Currency()
-        {
-            this.Base = "USD";
-            this.symbols = "RUB";
-        }
+        [JsonProperty("app_id")]
+        public string? app_id { get; set; }
+        [JsonProperty("Base")]
+        public string? Base { get; set; }
+        [JsonProperty("symbols")]
+        public string? symbols { get; set; }
+        [JsonProperty("URL")]
+        public string? url { get; set; }
+        [JsonProperty("PathTool")]
+        public string? pathTool { get; set; }
     }
 
     public class CurReport

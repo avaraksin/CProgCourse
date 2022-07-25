@@ -10,20 +10,19 @@ namespace GifSrvice.BussinessLogik
     public class CurrencyRates: ICurrencyRates
     {
         private IHttpClientFactory _httpClientFactory;
+        private IConfiguration _configuration;
 
-        private readonly string  exchangeRatesUrl = $"https://openexchangerates.org/api/historical/";
-        private readonly string pathTool = ".json";
-
-        public CurrencyRates(IHttpClientFactory clientFactory)
+        public CurrencyRates(IHttpClientFactory clientFactory, IConfiguration configuration)
         {
             _httpClientFactory = clientFactory;
+            _configuration = configuration;
         }
 
         public async Task<CurReport?> GetRate(DateTime date)
         {
-            var currency = new Currency();
+            var currency = _configuration.GetSection("Currency").Get<Currency>();
 
-            var fullpathUri = $"{exchangeRatesUrl}{date.ToString("yyyy-MM-dd")}{pathTool}";
+            var fullpathUri = $"{currency.url}{date.ToString("yyyy-MM-dd")}{currency.pathTool}";
 
             Dictionary<string, string?> parameters = new ()
             {

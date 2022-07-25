@@ -16,8 +16,10 @@ namespace GifSrvice.Controllers
     public class OperCurController : ControllerBase
     {
         private ICurrencyRates _currencyRates;
-        private IGif? _gif;
+        private IGif _gif;
         private IHttpClientFactory _httpClientFactory;
+
+        // private dbContext DbContext;
 
         private static int dayShift = -1;
 
@@ -54,8 +56,10 @@ namespace GifSrvice.Controllers
         public async Task<IActionResult> GetImage()
         {
             var imageSearchName = (await _currencyRates.IsCurrencyRiseFromYesterday()) == 1 ? "rich" : "broke";
-
-            var image = _gif?.GetGifUrl(await _gif?.GetImage(imageSearchName));
+           
+            var imageUrl = await _gif.GetImage(imageSearchName);
+            var image = _gif.GetGifUrl(imageUrl);
+            Console.WriteLine(imageUrl?.data?.images?.preview?.mp4);
             
             var client = _httpClientFactory.CreateClient();
             var request = new HttpRequestMessage(HttpMethod.Get, image);

@@ -1,6 +1,10 @@
 using GifSrvice.BussinessLogik;
 using GifSrvice.Controllers;
 using GifSrvice.Interface;
+using Microsoft.Extensions.Configuration;
+using GifSrvice.Data;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +16,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
+//builder.Services.AddDbContext<>();
+
 builder.Services.AddScoped<ICurrencyRates, CurrencyRates>();
 builder.Services.AddScoped<IGif, Gif>();
 
@@ -20,6 +26,11 @@ builder.Services.AddHttpContextAccessor();
 //builder.Services.AddSingleton<ICurrencyRates, CurrencyRates>();
 //builder.Services.AddSingleton<IGif, Gif>();
 
+
+
+//var confBuilder = new ConfigurationBuilder().AddJsonFile("json.json"); 
+//IConfiguration AppConfiguration = confBuilder.Build();
+//builder.Services.Configure<GifServiceSettings>(AppConfiguration);
 
 var app = builder.Build();
 

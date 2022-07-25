@@ -2,27 +2,32 @@
 using GifSrvice.Interface;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 
 namespace GifSrvice.BussinessLogik
 {
     public class Gif : IGif
     {
         private IHttpClientFactory _httpClientFactory;
+        private IConfiguration _configuration { get; }
 
-        public Gif(IHttpClientFactory httpClientFactory)
+        public Gif(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         public async Task<Gifdata?> GetImage(string? param)
         {
-            var fullpath = $"https://api.giphy.com/v1/gifs/random";
+            var settings = _configuration.GetSection("GifServiceSettings").Get<GifServiceSettings>();
+
+            var fullpath = settings.url;
 
             Dictionary<string, string?> uriDict = new()
             {
-                { "api_key", @"GTRyejAYZqD0cfjcbjh74d8V6tfY0YEK" },
-                { "tag",     param },
-                { "rating",  "g" }
+                { "api_key", settings.api_key   },
+                { "tag",     param              },
+                { "rating",  settings.rating    }
             };
 
             fullpath = QueryHelpers.AddQueryString(fullpath, uriDict);
@@ -35,9 +40,9 @@ namespace GifSrvice.BussinessLogik
             return JsonConvert.DeserializeObject<Gifdata>(await response.Content.ReadAsStringAsync());
         }
 
-        public string? GetGifUrl(Gifdata? gifdata)
+        public string? GetGifUrl(Gifdata gifdata)
         {
-                return gifdata?.data?.images?.preview?.mp4;
+            return gifdata?.data?.images?.preview?.mp4;
         }
     }
 }

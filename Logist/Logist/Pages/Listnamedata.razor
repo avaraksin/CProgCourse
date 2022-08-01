@@ -1,0 +1,53 @@
+﻿@page "/Listnamedata"
+
+@using Logist.Interfaces;
+@using Logist.Data;
+
+@inject ICtrlListname _ctrllistname
+
+<PageTitle>Listnamedata</PageTitle>
+<h1>Справочники</h1>
+
+
+@if (listname == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped align-middle table-bordered">
+        <thead class="table-success">
+            <tr>
+                <th>clnum</th>
+                <th>idList</th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Name2</th>
+               
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Listname list in listname)
+            {
+                <tr>
+                    <td>@list.clnum</td>
+                    <td>@list.Idlist</td>
+                    <td>@list.id</td>
+                    <td>@list.Name</td>
+                    <td>@list.name2</td>
+                    <td>
+                        
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+@code {
+    private List<Listname>? listname;
+
+    protected override async Task<List<Listname>> OnInitializedAsync() =>
+    
+        listname =  await Task.FromResult(_ctrllistname.GetListname());
+}

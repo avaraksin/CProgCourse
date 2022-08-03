@@ -11,11 +11,14 @@ namespace Logist.Data
         {
             _dbContext = dbContext;
         }
-        public List<lists> GetLists()
+        public List<Lists> GetLists()
         {
             try
             {
-                return _dbContext.lists.Where(l => l.clnum == ClNum.clnum).OrderBy(l => l.clnum).OrderBy(l => l.id).ToList();
+                return _dbContext.lists
+                    .Where(l => l.clnum == ClNum.clnum)
+                    .OrderBy(l => l.clnum).OrderBy(l => l.id)
+                    .ToList();
                 //return _dbContext.lists.Where(l => l.clnum == ClNum.clnum).ToList();
             }
             catch
@@ -25,7 +28,7 @@ namespace Logist.Data
         }
 
          //Для добавления новой записи пользователя
-        public void AddLists(lists _lists)
+        public void AddLists(Lists _lists)
         {
             try
             {
@@ -38,7 +41,7 @@ namespace Logist.Data
             }
         }
         //Для обновления записи конкретного пользователя
-        public void UpdateLists(lists _lists)
+        public void UpdateLists(Lists _lists)
         {
             try
             {
@@ -51,11 +54,11 @@ namespace Logist.Data
             }
         }
         //Для получения информации о конкретном пользователе
-        public lists GetLists(int id)
+        public Lists GetLists(int id)
         {
             try
             {
-                lists? _lists = _dbContext.lists.Where(l => l.clnum == ClNum.clnum && l.id == id).ToList()[0];
+                Lists? _lists = _dbContext.lists.Where(l => l.clnum == ClNum.clnum && l.id == id).ToList()[0];
                 if (_lists != null)
                 {
                     return _lists;
@@ -75,7 +78,7 @@ namespace Logist.Data
         {
             try
             {
-                lists? _lists = _dbContext.lists.Where(l => l.clnum == ClNum.clnum && l.id == id).ToList()[0];
+                Lists? _lists = _dbContext.lists.Where(l => l.clnum == ClNum.clnum && l.id == id).ToList()[0];
                 if (_lists != null)
                 {
                     _dbContext.Remove(_lists);

@@ -3,7 +3,10 @@
 @using Logist.Interfaces;
 @using Logist.Data;
 
+
 @inject ICtrlListname _ctrllistname
+@inject ICtrlLists _ctrllists
+
 
 <PageTitle>Listnamedata</PageTitle>
 <h1>Справочники</h1>
@@ -15,6 +18,14 @@
 }
 else
 {
+   <Select TValue="int" SelectedValue="@selectedValue" SelectedValueChanged="@OnSelectedValueChanged" >
+    @foreach (var list in _ctrllists.GetLists())
+        {
+            <SelectItem Value=@list.id>@list.Name</SelectItem>
+        }
+</Select>
+
+    <p> </p>
     <table class="table table-striped align-middle table-bordered">
         <thead class="table-success">
             <tr>
@@ -23,6 +34,8 @@ else
                 <th>ID</th>
                 <th>Name</th>
                 <th>Name2</th>
+                <th>CUSER</th>
+                <th>CHDATE</th>
                
             </tr>
         </thead>
@@ -35,6 +48,8 @@ else
                     <td>@list.id</td>
                     <td>@list.Name</td>
                     <td>@list.name2</td>
+                    <td>@list.cuser</td>
+                    <td>@list.chdate</td>
                     <td>
                         
                     </td>
@@ -46,8 +61,21 @@ else
 }
 @code {
     private List<Listname>? listname;
+    int selectedValue = 1;
 
-    protected override async Task<List<Listname>> OnInitializedAsync() =>
-    
-        listname =  await Task.FromResult(_ctrllistname.GetListname());
+    protected override async Task OnInitializedAsync()
+    {
+
+        listname = await Task.FromResult(_ctrllistname.GetListname().Where(l => l.Idlist == selectedValue).ToList());
+        //listname = await Task.FromResult(_factorylistname.GetListName());
+    }
+
+    async Task OnSelectedValueChanged( int value )
+    {
+        selectedValue = value;
+        Console.WriteLine( selectedValue );
+        await OnInitializedAsync();
+        //return await Task.CompletedTask;
+    }
+
 }

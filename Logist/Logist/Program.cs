@@ -1,9 +1,12 @@
+
 using Logist.Data;
 using Logist.Interfaces;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.ResponseCompression;
+
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,15 +16,24 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ICtrlListname, CtrlListname>();
 builder.Services.AddScoped<ICtrlLists, CtrlLists>();
+//builder.Services.AddScoped<FactoryListname>();
 
 
-//builder.Services.AddDbContextFactory<ApplicationDbContext>(
+//builder.Services.AddDbContextFactory<AppFactory>(
 //        options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));
 
 builder.Services.AddDbContext<ApplicationDbContext>(
         options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));
 
 builder.Services.AddRazorPages();
+
+builder.Services
+    .AddBlazorise(options =>
+    {
+        options.Immediate = true;
+    })
+.AddBootstrapProviders()
+.AddFontAwesomeIcons();
 
 var app = builder.Build();
 

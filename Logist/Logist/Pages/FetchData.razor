@@ -1,13 +1,11 @@
 ﻿@page "/fetchdata"
 
-<PageTitle>Users</PageTitle>
+<PageTitle>Lists</PageTitle>
 
 @using Logist.Data
 @inject ICtrlLists _ctrllists
 
-<h1>Weather forecast</h1>
-
-<p>Users.</p>
+<h1>Каталог справочников</h1>
 
 @if (_lists == null)
 {
@@ -15,7 +13,9 @@
 }
 else
 {
-    <table class="table">
+    
+   
+     <table class="table">
         <thead>
             <tr>
                 <th>ClNum</th>
@@ -39,10 +39,13 @@ else
 }
 
 @code {
-    private lists[]? _lists;
+    private Lists[]? _lists;
+    IEnumerable<Lists> FilterLists;
 
-    protected override async Task<lists[]> OnInitializedAsync() =>
-    
+    protected override async Task OnInitializedAsync() 
+    {
+
         _lists =  await Task.FromResult(_ctrllists.GetLists().ToArray());
-    
+    }
+   
 }

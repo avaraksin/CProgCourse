@@ -7,8 +7,8 @@ namespace Logist.Data
         public AppFactory(DbContextOptions<AppFactory> options)
             : base(options) { }
 
-        public DbSet<Lists> lists { get; set; }
-        public DbSet<Listname> listnames { get; set; }
+        public DbSet<Lists>? lists { get; set; }
+        public DbSet<Listname>? listnames { get; set; }
     }
 
     public class FactoryListname

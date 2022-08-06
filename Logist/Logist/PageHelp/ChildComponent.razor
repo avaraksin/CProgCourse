@@ -1,0 +1,99 @@
+﻿@using Logist.Data
+
+@inject ICtrlListname  _ctrlListname
+@inject ICtrlLists     _ctrlLists
+
+<Modal @ref = "@modalRef">
+    <ModalContent Centered>
+        <ModalHeader>
+            <ModalTitle>Редактировать справочник</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <h3>@(_ctrlLists.GetLists(idList).Name))</h3>
+            <Field>
+                <FieldLabel>Наименование</FieldLabel>
+                <TextEdit @ref = "@Name" />
+            </Field>
+            <p></p>
+            <Field>
+                <FieldLabel>Комментарий</FieldLabel>
+                <MemoEdit @ref = "@cmnt" Rows = "3" />
+            </Field>
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+            <Button Color="Color.Primary" Clicked="@SaveModal">Save Changes</Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+@code {
+    Modal? modalRef;
+    int idList = 1;
+    int id = 0;
+    TextEdit? Name ;
+    MemoEdit? cmnt;
+    public bool changeResult { get; set; } = false;
+    Listnamedata listnamedata;
+
+    [Inject] IMessageService? MessageService { get; set; }
+
+
+    public async Task OnEditBtClick(int idList, int id, Listnamedata listnamedata)
+    {
+        this.idList = idList;
+        this.id = id;
+
+        if (id > 0)
+        {
+            var lname = await _ctrlListname.GetListname(idList, id);
+            Name.Placeholder = Name.Text = lname.Name;
+            //cmnt.Placeholder = cmnt.Text = lname.Comment;
+        }
+        else
+        {
+            Name.Placeholder = "Укажите наименование";  Name.Text = "";
+            cmnt.Placeholder = "Комментарий (необязательно)";  cmnt.Text = "";
+        }
+        cmnt.Focus(true);  Name.Focus(true);
+        this.listnamedata = listnamedata;
+        modalRef.Show();
+
+    }
+    private Task HideModal()
+    {
+        changeResult = false;
+        return modalRef.Hide();
+    }
+
+    private async Task SaveModal()
+    {
+        if (Name.Text.Length == 0)
+        {
+            MessageService.Error( "Нельзя сохранить пустую строку!", "" );
+            return;
+        }
+
+        Listname listname = new Listname();
+        listname.clnum = ClNum.clnum;
+        listname.Idlist = idList;
+        listname.id = id;
+        listname.Name = Name.Text;
+        listname.Comment = cmnt.Text;
+        changeResult = _ctrlListname.AddListname(listname);
+
+        if (changeResult)
+        {
+            await MessageService.Info( "Данные успешно сохранены!", "" );
+            await modalRef.Close(CloseReason.UserClosing);
+            await listnamedata.Refr();
+           
+            return;
+        }
+
+        MessageService.Error( "При сохранении данных возникла ошибка:\n" + _ctrlListname.ErrMessage, "" );
+        return;
+    }
+
+}

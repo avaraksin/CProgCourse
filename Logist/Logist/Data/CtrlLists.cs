@@ -11,7 +11,7 @@ namespace Logist.Data
         {
             _dbContext = dbContext;
         }
-        public List<Lists> GetLists()
+        public List<Lists>? GetLists()
         {
             try
             {
@@ -23,7 +23,7 @@ namespace Logist.Data
             }
             catch
             {
-                throw;
+                return null;
             }
         }
 
@@ -58,19 +58,19 @@ namespace Logist.Data
         {
             try
             {
-                Lists? _lists = _dbContext.lists.Where(l => l.clnum == ClNum.clnum && l.id == id).ToList()[0];
+                Lists? _lists = _dbContext.lists.FirstOrDefault(l => l.clnum == ClNum.clnum && l.id == id);
                 if (_lists != null)
                 {
                     return _lists;
                 }
                 else
                 {
-                    throw new ArgumentNullException();
+                    return null;
                 }
             }
             catch
             {
-                throw;
+                return null;
             }
         }
         //Для удаления записи конкретного пользователя

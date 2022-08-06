@@ -2,13 +2,14 @@
 
 @using Logist.Interfaces;
 @using Logist.Data;
+@using Logist.PageHelp
 
 
 @inject ICtrlListname _ctrllistname
 @inject ICtrlLists _ctrllists
 
+<PageTitle>Справочники</PageTitle>
 
-<PageTitle>Listnamedata</PageTitle>
 <h1>Справочники</h1>
 
 
@@ -18,64 +19,76 @@
 }
 else
 {
-   <Select TValue="int" SelectedValue="@selectedValue" SelectedValueChanged="@OnSelectedValueChanged" >
-    @foreach (var list in _ctrllists.GetLists())
+   <Select TValue="int" SelectedValue="@idList" SelectedValueChanged="@OnSelectedValueChanged" >
+    @if (_ctrllists.GetLists() != null)
         {
-            <SelectItem Value=@list.id>@list.Name</SelectItem>
-        }
-</Select>
+            @foreach (var list in _ctrllists.GetLists())
+            {
+                <SelectItem Value=@list.id>@list.Name</SelectItem>
+            }
+
+    }
+    </Select>
+
+<Button Color="Color.Secondary" Outline Clicked="@(async () => HandleClick())">Новый</Button>
 
     <p> </p>
-    <table class="table table-striped align-middle table-bordered">
-        <thead class="table-success">
-            <tr>
-                <th>clnum</th>
-                <th>idList</th>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Name2</th>
-                <th>CUSER</th>
-                <th>CHDATE</th>
-               
-            </tr>
-        </thead>
-        <tbody>
+    <Table Hoverable Bordered>
+        <TableHeader >
+        <TableRow>
+            <TableHeaderCell>№№</TableHeaderCell>
+            <TableHeaderCell>Наименование</TableHeaderCell>
+            <TableHeaderCell>Комментарий</TableHeaderCell>
+        </TableRow>
+    </TableHeader>
+    <TableBody>
+       
+        @if (listname.Count > 0)
+        {
+            index = 0;
             @foreach (Listname list in listname)
             {
-                <tr>
-                    <td>@list.clnum</td>
-                    <td>@list.Idlist</td>
-                    <td>@list.id</td>
-                    <td>@list.Name</td>
-                    <td>@list.name2</td>
-                    <td>@list.cuser</td>
-                    <td>@list.chdate</td>
-                    <td>
-                        
-                    </td>
-                </tr>
-            }
-        </tbody>
+                    <TableRow @ondblclick="@(async () => HandleClick(list.id.ToString()))" >
+                        <TableRowCell>@(listname.IndexOf(list) + 1)</TableRowCell>
+                        <TableRowCell>@list.Name</TableRowCell>
+                        <TableRowCell>@list.Comment</TableRowCell>
+                    </TableRow>
 
-    </table>
+                    index++;
+             }
+         }
+       
+    </TableBody>
+</Table>
+
+<ChildComponent @ref = "@childComponent" />
+
 }
 @code {
     private List<Listname>? listname;
-    int selectedValue = 1;
+    public int idList = 1;
+    int index;
+    ChildComponent childComponent = new ChildComponent();
 
     protected override async Task OnInitializedAsync()
     {
-
-        listname = await Task.FromResult(_ctrllistname.GetListname().Where(l => l.Idlist == selectedValue).ToList());
-        //listname = await Task.FromResult(_factorylistname.GetListName());
+        listname = await Task.FromResult(_ctrllistname?.GetListname()?.Where(l => l.Idlist == idList).ToList());
     }
 
     async Task OnSelectedValueChanged( int value )
     {
-        selectedValue = value;
-        Console.WriteLine( selectedValue );
+        idList = value;
         await OnInitializedAsync();
-        //return await Task.CompletedTask;
+    }
+
+    async Task HandleClick(string myParam = "0")
+    {
+        await childComponent.OnEditBtClick(idList, int.Parse(myParam), this);
+    }
+
+    public async Task Refr()
+    {
+        await InvokeAsync(() =>{StateHasChanged();});
     }
 
 }

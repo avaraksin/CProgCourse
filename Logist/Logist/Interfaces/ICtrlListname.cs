@@ -3,11 +3,12 @@ namespace Logist.Interfaces
 {
     public interface ICtrlListname
     {
+        public string ErrMessage { get; set; }
         public List<Listname>? GetListname();
         public List<Listname> GetListname(int idList);
-        public void AddListname(Listname listname);
+        public bool AddListname(Listname listname);
         public void UpdateListname(Listname listname);
-        public Listname GetListname(int idList, int id);
+        public Task<Listname> GetListname(int idList, int id);
         public void DeleteListname(int idList, int id);
     }
 }

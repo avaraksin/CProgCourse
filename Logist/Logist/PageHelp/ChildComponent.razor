@@ -3,7 +3,7 @@
 @inject ICtrlListname  _ctrlListname
 @inject ICtrlLists     _ctrlLists
 
-<Modal @ref = "@modalRef">
+<Modal @ref = "@modalRef" @onsubmit = "@SaveModal">
     <ModalContent Centered>
         <ModalHeader>
             <ModalTitle>Редактировать справочник</ModalTitle>
@@ -49,7 +49,7 @@
         {
             var lname = await _ctrlListname.GetListname(idList, id);
             Name.Placeholder = Name.Text = lname.Name;
-            //cmnt.Placeholder = cmnt.Text = lname.Comment;
+            cmnt.Placeholder = cmnt.Text = lname.Comment;
         }
         else
         {
@@ -71,16 +71,18 @@
     {
         if (Name.Text.Length == 0)
         {
-            MessageService.Error( "Нельзя сохранить пустую строку!", "" );
+            await MessageService.Error("Нельзя сохранить пустую строку!", "");
             return;
         }
 
-        Listname listname = new Listname();
-        listname.clnum = ClNum.clnum;
-        listname.Idlist = idList;
-        listname.id = id;
-        listname.Name = Name.Text;
-        listname.Comment = cmnt.Text;
+        Listname listname = new()
+        {
+            clnum = ClNum.clnum,
+            Idlist = idList,
+            id = id,
+            Name = Name.Text,
+            Comment = cmnt.Text
+        };
         changeResult = _ctrlListname.AddListname(listname);
 
         if (changeResult)
@@ -92,7 +94,7 @@
             return;
         }
 
-        MessageService.Error( "При сохранении данных возникла ошибка:\n" + _ctrlListname.ErrMessage, "" );
+        await MessageService.Error( "При сохранении данных возникла ошибка:\n" + _ctrlListname.ErrMessage, "" );
         return;
     }
 

@@ -50,7 +50,7 @@ else
             {
                     <TableRow @ondblclick="@(async () => HandleClick(list.id.ToString()))" >
                         <TableRowCell>@(listname.IndexOf(list) + 1)</TableRowCell>
-                        <TableRowCell>@list.Name</TableRowCell>
+                        <TableRowCell Filterable = "@true">@list.Name</TableRowCell>
                         <TableRowCell>@list.Comment</TableRowCell>
                     </TableRow>
 

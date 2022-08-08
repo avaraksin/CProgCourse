@@ -1,0 +1,95 @@
+﻿@page "/guides"
+
+@inject ICtrlLists? _clists
+@inject ICtrlListname _cln
+
+<h3>Справочники</h3>
+
+    <SelectList TItem="Lists"
+        TValue="int"
+        Data="@lst"
+        TextField="@((item)=>item.Name)"
+        ValueField="@((item)=>item.id)"
+        SelectedValue="@selectedListValue"
+        SelectedValueChanged="@LstValueChangedHandler"
+    />
+    <p></p>
+
+    <DataGrid @ref = "@data" TItem="Listname"
+          Data="@ln"
+          @bind-SelectedRow="@selectedItem"
+          Responsive
+          UseValidation
+          Bordered
+          CommandMode = "DataGridCommandMode.Default"
+          EditMode = "DataGridEditMode.Popup"
+    >
+          
+          <DataGridColumns>
+            <DataGridCommandColumn>
+            <SaveCommandTemplate>
+                        <Button ElementId="btnSave" Type="ButtonType.Submit" PreventDefaultOnSubmit Color="Color.Primary" Clicked="@context.Clicked">@context.LocalizationString</Button>
+                    </SaveCommandTemplate>
+                    <CancelCommandTemplate>
+                        <Button ElementId="btnCancel" Color="Color.Secondary" Clicked="@context.Clicked">@context.LocalizationString</Button>
+                    </CancelCommandTemplate>
+            </DataGridCommandColumn>    
+            <DataGridColumn Field="@nameof(listname.id)" Caption="#" Sortable="false" />
+            <DataGridColumn Field="@nameof(listname.Name)" Caption="Наименование" Editable Validator="@CheckName"/>
+            <DataGridColumn Field="@nameof(listname.Comment)" Caption="Комментарий" Editable />
+            </DataGridColumns>
+            <ButtonRowTemplate>
+                <Button Color="Color.Success" Clicked="context.NewCommand.Clicked">New</Button>
+                <Button Color="Color.Primary" Disabled="(selectedItem is null)" Clicked="context.EditCommand.Clicked">Edit</Button>
+                <Button Color="Color.Danger" Disabled="(selectedItem is null)" Clicked="context.DeleteCommand.Clicked">Delete</Button>
+                <Button Color="Color.Link" Clicked="context.ClearFilterCommand.Clicked">Clear Filter</Button>
+            </ButtonRowTemplate>
+
+</DataGrid>
+
+
+
+@code {
+    DataGrid<Listname>? data;
+
+    // *****************************************************************************
+    int selectedListValue { get; set; } = 1;
+    List<Lists> lst = new();
+    // ***********************************************
+
+    //[Inject]
+    public Listname listname { get; set; }
+    private Listname selectedItem;
+    List<Listname> ln = new();
+
+    void LstValueChangedHandler(int newValue)
+    {
+        selectedListValue = newValue;
+        ln = _cln.GetListname(selectedListValue);
+        data?.Refresh();    
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        lst = _clists?.GetLists();
+        ln = _cln.GetListname(selectedListValue);
+        await base.OnInitializedAsync();
+    }
+
+
+    private void DblClickHandler()
+    {
+        Console.WriteLine(selectedItem.id);
+    }
+
+    public void CheckName( ValidatorEventArgs validationArgs )
+    {
+        ValidationRule.IsNotEmpty( validationArgs );
+
+        if ( validationArgs.Status == ValidationStatus.Error )
+        {
+            validationArgs.ErrorText = "Имя не может быть пустым!";
+        }
+    }
+
+}

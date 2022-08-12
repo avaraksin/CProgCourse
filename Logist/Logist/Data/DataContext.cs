@@ -20,8 +20,6 @@ namespace Logist.Data
                 entity.Property(e => e.name2).IsRequired(false);
                 entity.Property(e => e.name3).IsRequired(false);
                 entity.Property(e => e.Comment).IsRequired(false);
-                //entity.Property<int>(e => e.cuser).IsRequired(false);
-                //entity.Property<DateTime>(e => e.chdate).IsRequired(false);
 
                 entity.HasKey(c => new { c.Idlist, c.id, c.id2, c.clnum });
             });

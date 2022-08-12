@@ -7,8 +7,8 @@ namespace Logist.Interfaces
         public List<Listname>? GetListname();
         public List<Listname> GetListname(int idList);
         public bool AddListname(Listname listname);
-        public void UpdateListname(Listname listname);
+        public bool UpdateListname(Listname listname);
         public Task<Listname> GetListname(int idList, int id);
-        public void DeleteListname(int idList, int id);
+        public void DeleteListname(Listname listname);
     }
 }

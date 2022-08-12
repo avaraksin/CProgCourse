@@ -1,0 +1,169 @@
+﻿@page "/mudpage"
+
+@using MudBlazor
+
+
+@inject ICtrlLists? _clists
+@inject ICtrlListname _cln
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<h3>Справочники MudBlazor</h3>
+
+@if (lst == null)
+{
+    return;
+}
+
+<MudPaper Height="50px" Width="300px" Elevation="1">
+<MudSelect Margin="MudBlazor.Margin.Dense" T="Lists" Label="Укажите справочник" 
+    Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" FullWidth = "false"
+    @bind-Value="@listSelected" SelectedValuesChanged = "@OnChanged">
+    @foreach (var l in lst)
+    {
+        <MudSelectItem T="Lists" Value="@(l)">@l.Name</MudSelectItem>
+    }
+</MudSelect></MudPaper>
+<p></p>
+<MudFab Color="MudBlazor.Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(null))"/>
+<MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(mudTable.SelectedItem))"/>  
+<MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" OnClick = "@(() => DelItem(mudTable.SelectedItem))"/>
+<p></p>
+<style>
+    .selected {
+        background-color: #1E88E5 !important;
+    }
+
+        .selected > td {
+            color: white !important;
+        }
+
+            .selected > td .mud-input {
+                color: white !important;
+            }
+</style>
+<MudTable Items="@ln" Hover="true" 
+    Breakpoint="MudBlazor.Breakpoint.Sm" 
+    @ref="mudTable" 
+    OnRowClick="RowClickEvent" ondblclick = "@(async () => await TableDblClick())"
+    RowClassFunc="@SelectedRowClassFunc" T="Listname"
+    Bordered="true"
+    Striped="true"
+    CustomHeader="true">
+
+    <HeaderContent>
+        <MudTHeadRow Class="header-centered">
+        <MudTh Class="header-centered">№№</MudTh>
+        <MudTh>Наименование</MudTh>
+        <MudTh>Комметарий</MudTh>
+        </MudTHeadRow>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@(ln.IndexOf(context) + 1)</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Position">@context.Comment</MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    List<Lists> lst = new List<Lists>();
+    static Lists? listSelected { get; set; }
+
+    // ***********************************************
+    List<Listname> ln = new List<Listname>();
+    private int selectedRowNumber = -1;
+    private MudTable<Listname> mudTable;
+
+    protected override async Task OnInitializedAsync()
+    {
+        lst = _clists?.GetLists();
+        if (listSelected == null) listSelected = lst?.FirstOrDefault(x => x.id == 1);
+        if (listSelected != null) ln = _cln.GetListname(listSelected.id);
+    }
+
+    async Task OnChanged()
+    {
+
+        await OnInitializedAsync();
+        Console.WriteLine("Slectrd Value: " + listSelected.id); 
+    }
+
+    private string SelectedRowClassFunc(Listname element, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+        {
+            selectedRowNumber = rowNumber;
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+    private void RowClickEvent(TableRowClickEventArgs<Listname> tableRowClickEventArgs)
+    {
+        Console.WriteLine(mudTable.SelectedItem.id.ToString());
+    }
+
+    async Task CorrectElement(Listname? correctItem)
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+        DialogParameters param = new DialogParameters();
+
+        if (correctItem == null)
+        {
+            correctItem = new Listname();
+            correctItem.id = 0;
+            correctItem.Idlist = listSelected.id;
+            correctItem.clnum = ClNum.clnum;
+        }
+
+        param.Add("Item", correctItem);
+        var dialog = DialogService.Show<Dialog>(correctItem.id == 0 ? "Новый элемент" : "Редактирование справочников", param, closeOnEscapeKey);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+
+            var changeResult = _cln.AddListname(correctItem);
+
+            if (changeResult)
+            {
+                Snackbar.Add( "Данные успешно сохранены!", Severity.Success );
+                await OnInitializedAsync();
+                return;
+            }
+
+            Snackbar.Add( "При сохранении данных возникла ошибка:\n" + _cln.ErrMessage, Severity.Error);
+            return;
+        }
+    }
+
+    async Task DelItem(Listname Item)
+    {
+        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+        DialogParameters param = new DialogParameters();
+
+        param.Add("name", Item.Name);
+
+        var dialog = DialogService.Show<DelDialog>("Удаление элемента справочника", param, closeOnEscapeKey);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            _cln.DeleteListname(Item);
+        }
+    }
+
+    async Task TableDblClick()
+    {
+        await CorrectElement(mudTable.SelectedItem);
+    }
+
+}

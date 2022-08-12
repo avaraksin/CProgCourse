@@ -1,0 +1,48 @@
+﻿@using MudBlazor
+
+@inject ICtrlLists ctl
+@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6" Color = "MudBlazor.Color.Primary"><b><center>@ctl.GetLists(Item.Idlist).Name</center></b></MudText>
+        <p></p>
+        <MudTextField T="string" Label="Наименование" Text = "@Item.Name" @ref = "@name"/>
+        <MudTextField T="string" Label="Комментарий" Variant="Variant.Text" Lines="5" Text = "@Item.Comment" @ref = "@cmnt"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="Submit">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Listname Item { get; set; }
+
+    private MudTextField<string>? name;
+    private MudTextField<string>? cmnt;
+
+    void Submit() 
+    {
+        Item.Name = name.Text;
+        if (name.Text.Length == 0)
+        {
+            Snackbar.Add("Нельзя сохранить пустую строку!", Severity.Error);
+            name.FocusAsync();
+            return;
+        }
+
+
+
+        Item.Name = name.Text;
+        Item.Comment = cmnt.Text;
+       
+        
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+    
+    void Cancel() => MudDialog.Cancel();
+}

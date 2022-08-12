@@ -3,14 +3,14 @@
 @inject ICtrlListname  _ctrlListname
 @inject ICtrlLists     _ctrlLists
 
-<Modal @ref = "@modalRef" @onsubmit = "@SaveModal">
+<Modal @ref = "@modalRef" ><Form>
     <ModalContent Centered>
         <ModalHeader>
             <ModalTitle>Редактировать справочник</ModalTitle>
             <CloseButton />
         </ModalHeader>
         <ModalBody>
-            <h3>@(_ctrlLists.GetLists(idList).Name))</h3>
+            <h3>@_ctrlLists.GetLists(idList).Name</h3>
             <Field>
                 <FieldLabel>Наименование</FieldLabel>
                 <TextEdit @ref = "@Name" />
@@ -21,12 +21,23 @@
                 <MemoEdit @ref = "@cmnt" Rows = "3" />
             </Field>
         </ModalBody>
-        <ModalFooter>
-            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
-            <Button Color="Color.Primary" Clicked="@SaveModal">Save Changes</Button>
+        <ModalFooter> 
+            <Button Color="Color.Secondary" Clicked="@HideModal" Type = "ButtonType.Reset">Close</Button>
+            <Button Color="Color.Primary" Clicked="@SaveModal" Type="ButtonType.Submit">Save Changes</Button>
         </ModalFooter>
-    </ModalContent>
+    </ModalContent></Form>
 </Modal>
+
+<Modal @ref = "@Mess" >
+    <ModalBody>
+        <p> @MessageText</p>
+        <TextEdit @ref = "@Name" />
+        </ModalBody>
+        <ModalFooter>
+        <Button Color="Color.Secondary" Clicked="@OkBt" Type = "ButtonType.Reset">Close</Button>
+        </ModalFooter>
+</Modal>
+
 
 @code {
     Modal? modalRef;
@@ -36,6 +47,14 @@
     MemoEdit? cmnt;
     public bool changeResult { get; set; } = false;
     Listnamedata listnamedata;
+
+    Modal? Mess;
+    string MessageText;
+
+    void OkBt()
+    {
+        Mess.Hide();
+    }
 
     [Inject] IMessageService? MessageService { get; set; }
 
@@ -87,15 +106,22 @@
 
         if (changeResult)
         {
-            await MessageService.Info( "Данные успешно сохранены!", "" );
+            MessageService.Info( "Данные успешно сохранены!", "" );
             await modalRef.Close(CloseReason.UserClosing);
             await listnamedata.Refr();
-           
+
             return;
         }
 
-        await MessageService.Error( "При сохранении данных возникла ошибка:\n" + _ctrlListname.ErrMessage, "" );
-        return;
+
+
+        MessageText = "При сохранении данных возникла ошибка:\n" + _ctrlListname.ErrMessage;
+        Console.WriteLine(MessageText);
+        //await MessageService.Error( "При сохранении данных возникла ошибка:\n" + _ctrlListname.ErrMessage, "" );
+        //await modalRef.Hide();
+        Mess.ShowBackdrop = true;
+        Mess.Show();
+
     }
 
 }

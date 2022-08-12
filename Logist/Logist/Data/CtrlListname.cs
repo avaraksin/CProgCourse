@@ -46,16 +46,16 @@ namespace Logist.Data
             List<string> lst = new List<string>();
             try
             {
-                var listnames = GetListname(listname.Idlist);
-                if (listnames != null && listnames.Count > 0)
+                var allListRec = _dbContext.listname.Where(l => l.clnum == ClNum.clnum && l.Idlist == listname.Idlist).ToList();
+                if (allListRec != null && allListRec.Count > 0)
                 {
                     if (listname.id == 0)
                     {
-                        lst = listnames.Select(l => l.Name.ToLower()).ToList();
+                        lst = allListRec.Where(x => x.IsDel == 0).Select(l => l.Name.ToLower()).ToList();
                     }
                     else
                     {
-                         lst = listnames.Where(l => l.id != listname.id).Select(l => l.Name.ToLower()).ToList();
+                         lst = allListRec.Where(l => l.id != listname.id && l.IsDel == 0).Select(l => l.Name.ToLower()).ToList();
                     }
 
                     if (lst.Contains(listname.Name.ToLower()))
@@ -67,18 +67,19 @@ namespace Logist.Data
                 }
                 if (listname.id == 0) // Новый элемент
                 {
-                    listname.id = (listnames == null && listnames.Count == 0) ?
+                    
+                    listname.id = (allListRec == null && allListRec.Count == 0) ?
                                     1 :
-                                    listnames.Select(l => l.id).ToList().Max() + 1;
+                                    allListRec.Select(l => l.id).ToList().Max() + 1;
                     _dbContext.listname.Add(listname);
                 }
                 else
                 {
-                    //_dbContext.Entry(listname).State = EntityState.Modified;
-                    _dbContext.Entry(_dbContext.listname.FirstOrDefault(x => x.id == listname.id &&
-                                                                            x.Idlist == listname.Idlist &&
-                                                                            x.id2 == listname.id2 &&
-                                                                            x.clnum == listname.clnum)).CurrentValues.SetValues(listname);
+                    _dbContext.Entry(listname).State = EntityState.Modified;
+                    //_dbContext.Entry(_dbContext.listname.FirstOrDefault(x => x.id == listname.id &&
+                    //                                                        x.Idlist == listname.Idlist &&
+                    //                                                        x.id2 == listname.id2 &&
+                    //                                                        x.clnum == listname.clnum)).CurrentValues.SetValues(listname);
                 }
 
                 int result = _dbContext.SaveChanges();
@@ -88,24 +89,23 @@ namespace Logist.Data
                 }
                 return result == 0 ? false : true;
             }
-            catch
+            catch (Exception ex)
             {
-                ErrMessage = "Возникла проблема при соединении с Базой данных.";
+                ErrMessage = "Возникла проблема при соединении с Базой данных.\n" +
+                    ex.Message;
                 return false;
             }
         }
         //Для обновления записи конкретного пользователя
-        public void UpdateListname(Listname listname)
+        public bool UpdateListname(Listname listname)
         {
-            try
+            
             {
                 _dbContext.Entry(listname).State = EntityState.Modified;
                 _dbContext.SaveChanges();
             }
-            catch
-            {
-                throw;
-            }
+            
+            return true;
         }
         //Для получения информации о конкретном пользователе
         public async Task<Listname> GetListname(int idList, int id)
@@ -128,15 +128,14 @@ namespace Logist.Data
             }
         }
         //Для удаления записи конкретного пользователя
-        public void DeleteListname(int idList, int id)
+        public void DeleteListname(Listname listname)
         {
             try
             {
-                Listname? listname = _dbContext.listname.Where(l => l.Idlist ==  idList && l.id == id).ToList()[0];
                 if (listname != null)
                 {
                     listname.IsDel = 1;
-                    UpdateListname(listname);
+                    AddListname(listname);
                 }
                 else
                 {

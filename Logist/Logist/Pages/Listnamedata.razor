@@ -48,7 +48,7 @@ else
             index = 0;
             @foreach (Listname list in listname)
             {
-                    <TableRow @ondblclick="@(async () => HandleClick(list.id.ToString()))" >
+                    <TableRow @ondblclick="@(() => HandleClick(list.id.ToString()))" >
                         <TableRowCell>@(listname.IndexOf(list) + 1)</TableRowCell>
                         <TableRowCell Filterable = "@true">@list.Name</TableRowCell>
                         <TableRowCell>@list.Comment</TableRowCell>
@@ -68,7 +68,7 @@ else
     private List<Listname>? listname;
     public int idList = 1;
     int index;
-    ChildComponent childComponent = new ChildComponent();
+    ChildComponent childComponent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -83,12 +83,12 @@ else
 
     async Task HandleClick(string myParam = "0")
     {
-        await childComponent.OnEditBtClick(idList, int.Parse(myParam), this);
+        childComponent.OnEditBtClick(idList, int.Parse(myParam), this);
     }
 
     public async Task Refr()
     {
-        await InvokeAsync(() =>{StateHasChanged();});
+       // await InvokeAsync(() =>{StateHasChanged();});
     }
 
 }

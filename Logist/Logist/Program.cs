@@ -1,6 +1,7 @@
 
 using Logist.Data;
 using Logist.Interfaces;
+using Logist.Common;
 using Microsoft.EntityFrameworkCore;
 
 using Blazorise;
@@ -18,6 +19,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ICtrlListname, CtrlListname>();
 builder.Services.AddScoped<ICtrlLists, CtrlLists>();
+builder.Services.AddScoped<AppStatus>();
 //builder.Services.AddScoped<FactoryListname>();
 
 

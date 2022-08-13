@@ -5,12 +5,14 @@
         public static int clnum = 1;
     }
 
-    public static class AppStatus
+    public class AppStatus
     {
-        public static event Action OnChange;
-        
-        public static void UpdateState() => NotifyStateChanged();
+        public  event Action OnChange;
 
-        static void NotifyStateChanged() => OnChange?.Invoke();
+        public  int clnum { get; set; }
+        
+        public  void UpdateState() => NotifyStateChanged();
+
+         void NotifyStateChanged() => OnChange?.Invoke();
     }
 }

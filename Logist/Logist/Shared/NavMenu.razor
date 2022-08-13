@@ -1,4 +1,5 @@
 ﻿@implements IDisposable
+@inject AppStatus _appStatus
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -12,7 +13,7 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
 
     <nav class="flex-column">
-     @if (clnum == 2)
+     @if (_appStatus.clnum == 2)
      {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
@@ -37,21 +38,22 @@
 
 @code {
     private bool collapseNavMenu = true;
-    private static int clnum { get; set; }
+   
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    
+
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
 
-    public static void SetClNum(int clientnumber)
+    protected override void OnInitialized() 
     {
-        clnum = clientnumber;
+        _appStatus.OnChange += StateHasChanged;
     }
-
-    protected override void OnInitialized() => AppStatus.OnChange += StateHasChanged;
-    public void Dispose() => AppStatus.OnChange -= StateHasChanged;
+    public void Dispose() 
+    {
+        _appStatus.OnChange -= StateHasChanged;
+    }
 }

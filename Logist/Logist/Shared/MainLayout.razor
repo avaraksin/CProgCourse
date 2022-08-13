@@ -2,6 +2,8 @@
 
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
+@inject AppStatus _appStatus
+
 
 <PageTitle>Logist</PageTitle>
 
@@ -39,7 +41,7 @@
 </div>
 
 @code {
-    public static int CLNUM { get; private set; } = 1;
+    private int CLNUM { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -48,7 +50,7 @@
 
     void OnChanged()
     {
-        NavMenu.SetClNum(CLNUM);
-        AppStatus.UpdateState();
+        _appStatus.clnum = CLNUM;
+        _appStatus.UpdateState();
     }
 }

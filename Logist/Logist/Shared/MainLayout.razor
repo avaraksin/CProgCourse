@@ -1,6 +1,7 @@
 ﻿@using MudBlazor
 
 @inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
 
 <PageTitle>Logist</PageTitle>
 
@@ -10,8 +11,21 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <div class="top-row">
+<!-- ************************************************************************************************** -->           
+        <MudPaper Height="50px" Width="300px" Elevation="1">
+            <MudSelect Margin="MudBlazor.Margin.Dense" T="int" Label="Укажите номер клиента" 
+                Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" FullWidth = "false"
+                @bind-Value="@CLNUM" SelectedValuesChanged = "@OnChanged">
+        @for (int i = 1; i <=6; i++)
+        {
+            int index = i;
+            <MudSelectItem T="int" Value="@index" />
+        }
+
+
+        </MudSelect></MudPaper>
+<!-- ************************************************************************************************** -->
         </div>
 
         <article class="content px-4">
@@ -23,3 +37,18 @@
         <MudSnackbarProvider/>
     </main>
 </div>
+
+@code {
+    public static int CLNUM { get; private set; } = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    void OnChanged()
+    {
+        NavMenu.SetClNum(CLNUM);
+        AppStatus.UpdateState();
+    }
+}

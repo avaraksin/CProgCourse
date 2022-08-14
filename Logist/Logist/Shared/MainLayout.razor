@@ -3,6 +3,8 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject AppStatus _appStatus
+@implements IDisposable
+
 
 
 <PageTitle>Logist</PageTitle>
@@ -45,6 +47,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _appStatus.OnChange += StateHasChanged;
+        _appStatus.clnum = CLNUM;
         await base.OnInitializedAsync();
     }
 
@@ -52,5 +56,10 @@
     {
         _appStatus.clnum = CLNUM;
         _appStatus.UpdateState();
+    }
+
+     public void Dispose() 
+    {
+        _appStatus.OnChange -= StateHasChanged;
     }
 }

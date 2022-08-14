@@ -6,11 +6,13 @@ namespace Logist.Data
     public class CtrlListname : ICtrlListname
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly AppStatus _appStatus;
 
         public string ErrMessage { get; set; }
-        public CtrlListname(ApplicationDbContext dbContext)
+        public CtrlListname(ApplicationDbContext dbContext, AppStatus appStatus)
         {
             _dbContext = dbContext;
+            _appStatus = appStatus;
         }
         public List<Listname>? GetListname()
         {
@@ -33,7 +35,7 @@ namespace Logist.Data
         {
             try
             {
-                return _dbContext.listname.Where(l => l.clnum == ClNum.clnum && l.Idlist == idList && l.IsDel == 0).ToList();
+                return _dbContext.listname.Where(l => l.clnum == ClNum.clnum && l.Idlist == idList && l.IsDel == 0).Include(l => l.user).ToList();
             }
             catch
             {
@@ -65,6 +67,11 @@ namespace Logist.Data
                     }
                     
                 }
+                // Получаем текущего пользователя
+                _appStatus.UpdateState();
+                listname.cuser = _appStatus.clnum;
+                listname.chdate = DateTime.Now;
+
                 if (listname.id == 0) // Новый элемент
                 {
                     

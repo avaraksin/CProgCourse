@@ -1,6 +1,9 @@
 ﻿@page "/mudpage"
 
-@using MudBlazor
+@using System;
+@using System.Globalization;
+@using System.Reflection;
+@using MudBlazor;
 
 
 @inject ICtrlLists? _clists
@@ -56,12 +59,16 @@
         <MudTh Class="header-centered">№№</MudTh>
         <MudTh>Наименование</MudTh>
         <MudTh>Комметарий</MudTh>
+        <MudTh>User</MudTh>
+        <MudTh>Дата</MudTh>
         </MudTHeadRow>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@(ln.IndexOf(context) + 1)</MudTd>
-        <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Position">@context.Comment</MudTd>
+        <MudTd DataLabel="##">@(ln.IndexOf(context) + 1)</MudTd>
+        <MudTd DataLabel="Наименование">@context.Name</MudTd>
+        <MudTd DataLabel="Комментарий">@context.Comment</MudTd>
+        <MudTd DataLabel="User">@context?.user?.Shortname</MudTd>
+        <MudTd DataLabel="Дата модификации">@(context.chdate.ToString())</MudTd>
     </RowTemplate>
 </MudTable>
 

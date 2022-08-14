@@ -7,7 +7,7 @@
 
     public class AppStatus
     {
-        public  event Action OnChange;
+        public event Action OnChange;
 
         public  int clnum { get; set; }
         

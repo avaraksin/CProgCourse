@@ -1,4 +1,4 @@
-﻿using Logist.Common;
+﻿using Logist.Data.Usr;
 
 namespace Logist.Data
 {
@@ -13,8 +13,9 @@ namespace Logist.Data
         public string? name2 { get; set; }
         public string? name3 { get; set; }
         public string? Comment { get; set; }
-        public int? cuser { get; set; }
         public DateTime? chdate { get; set; }
-        
+
+        public int? cuser { get; set; }
+        public Users? user { get; set; }
     }
 }

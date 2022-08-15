@@ -45,8 +45,12 @@
 @code {
     private int CLNUM { get; set; }
 
+    [CascadingParameter]
+    private UserProvider? UserProvider { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        CLNUM = UserProvider.CurrentClientNum;
         _appStatus.OnChange += StateHasChanged;
         _appStatus.clnum = CLNUM;
         await base.OnInitializedAsync();
@@ -56,6 +60,9 @@
     {
         _appStatus.clnum = CLNUM;
         _appStatus.UpdateState();
+
+        UserProvider.CurrentClientNum = CLNUM;
+        UserProvider.SaveChangesAsync();
     }
 
      public void Dispose() 

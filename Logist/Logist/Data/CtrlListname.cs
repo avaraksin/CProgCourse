@@ -35,7 +35,9 @@ namespace Logist.Data
         {
             try
             {
-                return _dbContext.listname.Where(l => l.clnum == ClNum.clnum && l.Idlist == idList && l.IsDel == 0).Include(l => l.user).ToList();
+                return _dbContext.listname.Where(l => l.clnum == ClNum.clnum && l.Idlist == idList && l.IsDel == 0)
+                    .Include(l => l.user)
+                    .ToList();
             }
             catch
             {

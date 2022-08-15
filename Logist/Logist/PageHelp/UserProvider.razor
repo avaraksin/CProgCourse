@@ -1,0 +1,41 @@
+﻿@inject ProtectedSessionStorage ProtectedSessionStore
+
+    
+    @if (isLoaded)
+{
+        <CascadingValue Value="@this">
+            @ChildContent
+        </CascadingValue>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+
+@code {
+    private bool isLoaded;
+
+    public int CurrentClientNum { get; set; }
+    public int ListId { get; set; }
+
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProtectedSessionStore.GetAsync<int>("clnum");
+        CurrentClientNum = result.Success ? result.Value : 0;
+
+        result = await ProtectedSessionStore.GetAsync<int>("listid");
+        ListId = result.Success ? result.Value : 0;
+
+        isLoaded = true;
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await ProtectedSessionStore.SetAsync("clnum", CurrentClientNum);
+        await ProtectedSessionStore.SetAsync("listid", ListId);
+    }
+}

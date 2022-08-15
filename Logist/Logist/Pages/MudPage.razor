@@ -68,12 +68,15 @@
         <MudTd DataLabel="Наименование">@context.Name</MudTd>
         <MudTd DataLabel="Комментарий">@context.Comment</MudTd>
         <MudTd DataLabel="User">@context?.user?.Shortname</MudTd>
-        <MudTd DataLabel="Дата модификации">@(context.chdate.ToString())</MudTd>
+        <MudTd DataLabel="Дата модификации">@GetDateString(context.chdate)</MudTd>
     </RowTemplate>
 </MudTable>
 
 
 @code {
+    [CascadingParameter]
+    private UserProvider? UserProvider { get; set; }
+
     List<Lists> lst = new List<Lists>();
     Lists? listSelected { get; set; } 
 
@@ -85,15 +88,19 @@
     protected override async Task OnInitializedAsync()
     {
         lst = _clists?.GetLists();
-        if (listSelected == null) listSelected = lst?.FirstOrDefault(x => x.id == 1);
+        if (listSelected == null) listSelected = lst?.FirstOrDefault(x => x.id == (UserProvider.ListId == 0 ? 1 : UserProvider.ListId));
         if (listSelected != null) ln = _cln.GetListname(listSelected.id);
+
+        await base.OnInitializedAsync();
     }
 
     async Task OnChanged()
     {
+        UserProvider.ListId = listSelected.id;
+        UserProvider.SaveChangesAsync();
 
         await OnInitializedAsync();
-        Console.WriteLine("Slectrd Value: " + listSelected.id); 
+        Console.WriteLine("Selectrd Value: " + listSelected.id); 
     }
 
     private string SelectedRowClassFunc(Listname element, int rowNumber)
@@ -171,6 +178,11 @@
     async Task TableDblClick()
     {
         await CorrectElement(mudTable.SelectedItem);
+    }
+
+    string GetDateString(DateTime? dt)
+    {
+        return dt?.ToShortDateString();
     }
 
 }

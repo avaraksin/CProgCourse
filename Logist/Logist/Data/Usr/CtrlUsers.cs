@@ -1,20 +1,21 @@
-﻿using Logist.Data;
+﻿using Logist.Common;
+using Microsoft.EntityFrameworkCore;
 namespace Logist.Data.Usr
 {
     public class CtrlUsers
     {
-        private ApplicationDbContext _context;
+        private AppFactory _context;
         public string ErrMessage { get; set; }
-        public CtrlUsers(ApplicationDbContext dbContext)
+        public CtrlUsers(IDbContextFactory<AppFactory> dbContext)
         {
-            _context = dbContext;
+            _context = dbContext.CreateDbContext();
         }
-        public List<Users>? GetUsers(int clnum)
+        public List<Users>? GetUsers()
         {
             List<Users>? usr = null;
             try
             {
-                usr = _context.users.Where(u => u.clnum == clnum && u.isdel == 0)
+                usr = _context.users.Where(u => u.clnum == ClNum.clnum && u.isdel == 0)
                     .OrderBy(u => u.id)
                     .ToList();
                 if (usr == null)
@@ -30,12 +31,12 @@ namespace Logist.Data.Usr
             return usr;
         }
 
-        public Users? GetUsers(int clnum, int id)
+        public Users? GetUsers(int id)
         {
             Users? usr = null;
             try
             {
-                usr = _context.users.FirstOrDefault(u => u.clnum == clnum && u.id == id && u.isdel == 0);
+                usr = _context.users.FirstOrDefault(u => u.clnum == ClNum.clnum && u.id == id && u.isdel == 0);
                 if (usr == null)
                 {
                     usr = new Users();

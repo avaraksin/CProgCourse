@@ -3,7 +3,9 @@
 @inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 @inject AppStatus _appStatus
-@implements IDisposable
+
+@inject CtrlUsers _cuser
+
 
 
 
@@ -16,7 +18,18 @@
 
     <main>
         <div class="top-row">
-<!-- ************************************************************************************************** -->           
+<!-- ************************************************************************************************** -->      
+        <MudPaper Height="50px" Width="300px" Elevation="1">
+            <MudSelect Margin="MudBlazor.Margin.Dense" T="Users" Label="Укажите Пользователя" 
+                Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" FullWidth = "false"
+                @bind-Value="@currentUser" SelectedValuesChanged = "@OnChanged">
+        @foreach (var u in users)
+        {
+            <MudSelectItem T="Users" Value="@u">@u.Shortname</MudSelectItem>
+        }
+        </MudSelect></MudPaper>
+
+
         <MudPaper Height="50px" Width="300px" Elevation="1">
             <MudSelect Margin="MudBlazor.Margin.Dense" T="int" Label="Укажите номер клиента" 
                 Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" FullWidth = "false"
@@ -44,15 +57,18 @@
 
 @code {
     private int CLNUM { get; set; }
+    private Users currentUser { get; set; }
+    private List<Users> users;
 
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        users = _cuser.GetUsers();
         CLNUM = UserProvider.CurrentClientNum;
-        _appStatus.OnChange += StateHasChanged;
-        _appStatus.clnum = CLNUM;
+        currentUser = users?.FirstOrDefault(x => x.id == UserProvider?.CurrentUser?.id);
+        
         await base.OnInitializedAsync();
     }
 
@@ -62,11 +78,9 @@
         _appStatus.UpdateState();
 
         UserProvider.CurrentClientNum = CLNUM;
+        UserProvider.CurrentUser = currentUser;
         UserProvider.SaveChangesAsync();
     }
 
-     public void Dispose() 
-    {
-        _appStatus.OnChange -= StateHasChanged;
-    }
+    
 }

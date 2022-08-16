@@ -1,36 +1,34 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Logist.Data.Usr;
 
 namespace Logist.Data
 {
-    public class AppFactory :  DbContext
+    public class AppFactory : DbContext
     {
         public AppFactory(DbContextOptions<AppFactory> options)
             : base(options) { }
 
         public DbSet<Lists>? lists { get; set; }
-        public DbSet<Listname>? listnames { get; set; }
-    }
+        public DbSet<Listname>? listname { get; set; }
+        public DbSet<Users> users { get; set; }
 
-    public class FactoryListname
-    {
-        private readonly IDbContextFactory<AppFactory> _context;
 
-        public FactoryListname(IDbContextFactory<AppFactory> dbContext)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            _context = dbContext;
-        }
+            modelBuilder.Entity<Lists>().HasKey(c => new { c.clnum, c.id });
+            modelBuilder.Entity<Users>().HasKey(c => new { c.clnum, c.id });
 
-        public List<Listname> GetListName()
-        {
-            using (var context = _context.CreateDbContext())
+            modelBuilder.Entity<Listname>(entity =>
             {
-                if (context != null)
-                {
-                    List<Listname> list = context.listnames.ToList();
-                    return list;
-                }
-            }
-            return null;
+                entity.Property(e => e.Name).IsRequired(false);
+                entity.Property(e => e.name2).IsRequired(false);
+                entity.Property(e => e.name3).IsRequired(false);
+                entity.Property(e => e.Comment).IsRequired(false);
+
+                entity.HasKey(c => new { c.Idlist, c.id, c.id2, c.clnum });
+                entity.HasOne(l => l.user).WithMany().HasForeignKey(l => new { l.clnum, l.cuser }).HasPrincipalKey(l => new { l.clnum, l.id });
+            });
         }
+
     }
 }

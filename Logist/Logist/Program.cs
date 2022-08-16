@@ -1,12 +1,9 @@
 
 using Logist.Data;
+using Logist.Data.Usr;
 using Logist.Interfaces;
 using Logist.Common;
 using Microsoft.EntityFrameworkCore;
-
-using Blazorise;
-using Blazorise.Bootstrap;
-using Blazorise.Icons.FontAwesome;
 
 using MudBlazor.Services;
 
@@ -20,24 +17,17 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ICtrlListname, CtrlListname>();
 builder.Services.AddScoped<ICtrlLists, CtrlLists>();
 builder.Services.AddScoped<AppStatus>();
-//builder.Services.AddScoped<FactoryListname>();
+builder.Services.AddScoped<CtrlUsers>();
+builder.Services.AddScoped<UserConnectionData>();
 
 
-//builder.Services.AddDbContextFactory<AppFactory>(
-//        options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));
-
-builder.Services.AddDbContext<ApplicationDbContext>(
+builder.Services.AddDbContextFactory<AppFactory>(
         options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));
 
-builder.Services.AddRazorPages();
+//builder.Services.AddDbContext<ApplicationDbContext>(
+//        options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));
 
-builder.Services
-    .AddBlazorise(options =>
-    {
-        options.Immediate = true;
-    })
-.AddBootstrapProviders()
-.AddFontAwesomeIcons();
+builder.Services.AddRazorPages();
 
 builder.Services.AddMudServices();
 

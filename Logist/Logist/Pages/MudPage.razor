@@ -171,8 +171,19 @@
 
         if (!result.Cancelled)
         {
-            _cln.DeleteListname(Item);
+            var delResult = _cln.DeleteListname(Item);
+            
+            if (delResult)
+            {
+                Snackbar.Add( "Данные успешно удалены!", Severity.Success );
+                await OnInitializedAsync();
+                return;
+            }
+
+            Snackbar.Add( "При удалении данных возникла ошибка:\n" + _cln.ErrMessage, Severity.Error);
+            return;
         }
+
     }
 
     async Task TableDblClick()

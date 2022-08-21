@@ -5,7 +5,7 @@
 
 <MudDialog>
     <DialogContent>
-        <MudText Typo="Typo.h6" Color = "MudBlazor.Color.Primary"><b><center>@ctl.GetLists(Item.Idlist).Name</center></b></MudText>
+        <MudText Typo="Typo.h6" Color = "MudBlazor.Color.Primary"><b><center>@ctl?.GetLists(Item.clnum, Item.Idlist)?.Name</center></b></MudText>
         <p></p>
         <MudTextField T="string" Label="Наименование" Text = "@Item.Name" @ref = "@name"/>
         <MudTextField T="string" Label="Комментарий" Variant="Variant.Text" Lines="5" Text = "@Item.Comment" @ref = "@cmnt"/>
@@ -35,10 +35,8 @@
             return;
         }
 
-
-
         Item.Name = name.Text;
-        Item.Comment = cmnt.Text;
+        Item.Comment = cmnt?.Text;
        
         
         MudDialog.Close(DialogResult.Ok(true));

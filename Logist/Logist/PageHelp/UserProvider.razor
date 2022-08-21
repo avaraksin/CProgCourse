@@ -1,11 +1,9 @@
 ﻿
-@implements IDisposable
 @inject ProtectedSessionStorage ProtectedSessionStore
-@inject UserConnectionData _userConnectionData
 
-    
+
     @if (isLoaded)
-{
+    {
         <CascadingValue Value="@this">
             @ChildContent
         </CascadingValue>
@@ -23,6 +21,7 @@
     public int ListId { get; set; }
 
 
+
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
@@ -38,10 +37,6 @@
         CurrentUser = uresult.Success ? uresult.Value : null;
 
         isLoaded = true;
-
-        _userConnectionData.OnChange += StateHasChanged;
-        _userConnectionData.CurrentClNum = CurrentClientNum;
-        _userConnectionData.CurrentUser = CurrentUser;
     }
 
    
@@ -52,8 +47,4 @@
         await ProtectedSessionStore.SetAsync("user", CurrentUser);
     }
 
-    public void Dispose() 
-    {
-        _userConnectionData.OnChange -= StateHasChanged;
-    }
 }

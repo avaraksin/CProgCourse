@@ -6,20 +6,18 @@ namespace Logist.Data
     public class CtrlListname : ICtrlListname
     {
         private readonly AppFactory _dbContext;
-        private readonly UserConnectionData? _userConnectionData;
+        //private readonly UserConnectionData? _userConnectionData;
         public string ErrMessage { get; set; }
 
-        public CtrlListname(IDbContextFactory<AppFactory> dbContext, UserConnectionData userConnectionData)
+        public CtrlListname(IDbContextFactory<AppFactory> dbContext)
         {
             _dbContext = dbContext.CreateDbContext();
-            _userConnectionData = userConnectionData;
         }
         
-        public List<Listname>? GetListname(int idList)
+        public List<Listname>? GetListname(int clnum, int idList)
         {
-            _userConnectionData.UpdateState();
-            return _dbContext?.listname?.Where(l => l.clnum == _userConnectionData.CurrentClNum 
-                                                                && l.Idlist == idList && l.IsDel == 0)
+            return _dbContext?.listname?.Where(l => l.clnum == clnum 
+                         && l.Idlist == idList && l.IsDel == 0)
                     .OrderBy(l => l.Name)
                     .Include(l => l.user)
                     .ToList();
@@ -28,12 +26,9 @@ namespace Logist.Data
         public bool AddListname(Listname listname)
         {
             List<string> lst = new List<string>();
-            _userConnectionData.UpdateState();
+            
 
-            int clnum = _userConnectionData.CurrentClNum;
-            int userId = _userConnectionData.CurrentUser.id;
-
-            var allListRec = _dbContext.listname.Where(l => l.clnum == clnum && l.Idlist == listname.Idlist).ToList();
+            var allListRec = _dbContext.listname.Where(l => l.clnum == listname.clnum && l.Idlist == listname.Idlist).ToList();
             if (allListRec != null && allListRec.Count > 0)
             {
                 if (listname.id == 0)
@@ -54,7 +49,6 @@ namespace Logist.Data
             
             // Получаем текущего пользователя
             
-            listname.cuser = userId;
             listname.chdate = DateTime.Now;
 
             if (listname.id == 0) // Новый элемент

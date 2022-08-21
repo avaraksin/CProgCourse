@@ -1,51 +1,52 @@
-﻿@page "/mudpage"
+﻿@page "/mudpage/{Page:int}"
 
 @using System;
 @using System.Globalization;
 @using System.Reflection;
-@using MudBlazor;
-
 
 @inject ICtrlLists? _clists
 @inject ICtrlListname _cln
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
+@inject AppStatus _appStatus
 
-<h3>Справочники MudBlazor</h3>
+<h3>Справочники</h3>
+
 
 @if (lst == null)
 {
     return;
 }
 
-<MudPaper Height="50px" Width="300px" Elevation="1">
-<MudSelect Margin="MudBlazor.Margin.Dense" T="Lists" Label="Укажите справочник" 
+    
+    <MudPaper Height="50px" Width="300px" Elevation="1">
+        <MudSelect Margin="MudBlazor.Margin.Dense" T="Lists" Label="Укажите справочник" 
     Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" FullWidth = "false"
     @bind-Value="@listSelected" SelectedValuesChanged = "@OnChanged">
-    @foreach (var l in lst)
-    {
-        <MudSelectItem T="Lists" Value="@(l)">@l.Name</MudSelectItem>
-    }
-</MudSelect></MudPaper>
-<p></p>
-<MudFab Color="MudBlazor.Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(null))"/>
-<MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(mudTable.SelectedItem))"/>  
-<MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" OnClick = "@(() => DelItem(mudTable.SelectedItem))"/>
-<p></p>
-<style>
-    .selected {
+            @foreach (var l in lst)
+            {
+                <MudSelectItem T="Lists" Value="@(l)">@l.Name</MudSelectItem>
+            }
+        </MudSelect></MudPaper>
+    <p></p>
+    <MudFab Color="MudBlazor.Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(null))"/>
+    <MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(mudTable.SelectedItem))"/>  
+    <MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" OnClick = "@(() => DelItem(mudTable.SelectedItem))"/>
+    <p></p>
+    <style>
+        .selected {
         background-color: #1E88E5 !important;
-    }
-
-        .selected > td {
-            color: white !important;
         }
 
-            .selected > td .mud-input {
-                color: white !important;
-            }
-</style>
-<MudTable Items="@ln" Hover="true" 
+        .selected > td {
+        color: white !important;
+        }
+
+        .selected > td .mud-input {
+        color: white !important;
+        }
+    </style>
+    <MudTable Items="@ln" Hover="true" 
     Breakpoint="MudBlazor.Breakpoint.Sm" 
     @ref="mudTable" 
     OnRowClick="RowClickEvent" ondblclick = "@(async () => await TableDblClick())"
@@ -54,26 +55,29 @@
     Striped="true"
     CustomHeader="true">
 
-    <HeaderContent>
-        <MudTHeadRow Class="header-centered">
-        <MudTh Class="header-centered">№№</MudTh>
-        <MudTh>Наименование</MudTh>
-        <MudTh>Комметарий</MudTh>
-        <MudTh>User</MudTh>
-        <MudTh>Дата</MudTh>
-        </MudTHeadRow>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="##">@(ln.IndexOf(context) + 1)</MudTd>
-        <MudTd DataLabel="Наименование">@context.Name</MudTd>
-        <MudTd DataLabel="Комментарий">@context.Comment</MudTd>
-        <MudTd DataLabel="User">@context?.user?.Shortname</MudTd>
-        <MudTd DataLabel="Дата модификации">@GetDateString(context.chdate)</MudTd>
-    </RowTemplate>
-</MudTable>
-
+        <HeaderContent>
+            <MudTHeadRow Class="header-centered">
+                <MudTh Class="header-centered">№№</MudTh>
+                <MudTh>Наименование</MudTh>
+                <MudTh>Комметарий</MudTh>
+                <MudTh>User</MudTh>
+                <MudTh>Дата</MudTh>
+            </MudTHeadRow>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="##">@(ln.IndexOf(context) + 1)</MudTd>
+            <MudTd DataLabel="Наименование">@context.Name</MudTd>
+            <MudTd DataLabel="Комментарий">@context.Comment</MudTd>
+            <MudTd DataLabel="User">@context?.user?.Shortname</MudTd>
+            <MudTd DataLabel="Дата модификации">@GetDateString(context.chdate)</MudTd>
+        </RowTemplate>
+    </MudTable>
+   
 
 @code {
+    [Parameter]
+    public int Page { get; set;}
+
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
@@ -85,20 +89,31 @@
     private int selectedRowNumber = -1;
     private MudTable<Listname> mudTable;
 
-    protected override async Task OnInitializedAsync()
-    {
-        lst = _clists?.GetLists();
-        if (listSelected == null) listSelected = lst?.FirstOrDefault(x => x.id == (UserProvider.ListId == 0 ? 1 : UserProvider.ListId));
-        if (listSelected != null) ln = _cln.GetListname(listSelected.id);
+    // ***********************************************
 
-        await base.OnInitializedAsync();
+    [CascadingParameter]
+    public TotalProvider? total { get; set; }
+    private Users currentUser = new();
+
+    protected override Task OnInitializedAsync()
+    {
+       return base.OnInitializedAsync();
     }
+
+    protected override Task OnParametersSetAsync()
+    {
+        lst = _clists?.GetLists(UserProvider != null ? UserProvider.CurrentClientNum : 1);
+        if (listSelected == null) listSelected = lst?.First(x => x.id == 1);
+
+        if (listSelected != null) ln = _cln.GetListname(UserProvider.CurrentClientNum, listSelected.id);
+
+        currentUser = UserProvider.CurrentUser;
+        return base.OnParametersSetAsync();
+    }
+
 
     async Task OnChanged()
     {
-        UserProvider.ListId = listSelected.id;
-        UserProvider.SaveChangesAsync();
-
         await OnInitializedAsync();
         Console.WriteLine("Selectrd Value: " + listSelected.id); 
     }
@@ -135,8 +150,10 @@
             correctItem = new Listname();
             correctItem.id = 0;
             correctItem.Idlist = listSelected.id;
-            correctItem.clnum = ClNum.clnum;
+            correctItem.clnum = listSelected.clnum;
+            
         }
+        correctItem.cuser = currentUser.id;
 
         param.Add("Item", correctItem);
         var dialog = DialogService.Show<Dialog>(correctItem.id == 0 ? "Новый элемент" : "Редактирование справочников", param, closeOnEscapeKey);

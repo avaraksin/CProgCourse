@@ -4,7 +4,7 @@ namespace Logist.Interfaces
 {
     public interface ICtrlLists
     {
-        public List<Lists>? GetLists();
-        public Lists? GetLists(int id);
+        public List<Lists>? GetLists(int clnum);
+        public Lists? GetLists(int clnum, int id);
     }
 }

@@ -9,10 +9,10 @@ namespace Logist.Data
     {
         private readonly AppFactory? _dbContext;
         private  int clnum;
-        private readonly UserConnectionData? _userConnectionData;
-        public CtrlLists(IDbContextFactory<AppFactory> dbContext, UserConnectionData userConnectionData)
+        //private readonly UserConnectionData? _userConnectionData;
+        public CtrlLists(IDbContextFactory<AppFactory> dbContext)
         {
-            _userConnectionData = userConnectionData;
+            //_userConnectionData = userConnectionData;
             _dbContext = dbContext.CreateDbContext();
         }
        
@@ -20,16 +20,14 @@ namespace Logist.Data
         /// <summary>
         /// Получение списка справочников
         /// </summary>
-        public List<Lists>? GetLists()
+        public List<Lists>? GetLists(int clnum)
         {
-            _userConnectionData?.UpdateState();
-            return  _dbContext?.lists?.Where(l => l.clnum ==_userConnectionData.CurrentClNum).ToList();
+            return  _dbContext?.lists?.Where(l => l.clnum == clnum).ToList();
         }
 
-        public Lists? GetLists(int id)
+        public Lists? GetLists(int clnum, int id)
         {
-            _userConnectionData?.UpdateState();
-            return _dbContext?.lists?.FirstOrDefault(x => x.id == id && x.clnum == _userConnectionData.CurrentClNum);
+            return _dbContext?.lists?.FirstOrDefault(x => x.id == id && x.clnum == clnum);
         }
     }
 }

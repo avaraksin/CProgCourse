@@ -45,9 +45,12 @@
 <!-- ************************************************************************************************** -->
         </div>
 
+        <TotalProvider @ref = "total">
         <article class="content px-4">
             @Body
         </article>
+        </TotalProvider>
+
 
         <MudThemeProvider/>
         <MudDialogProvider/>
@@ -55,31 +58,52 @@
     </main>
 </div>
 
-@code {
-    private int CLNUM { get; set; }
-    private Users currentUser { get; set; }
-    private List<Users> users;
 
+
+@code {
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
+    private TotalProvider total { get; set; } = new TotalProvider();
+
+
+
+    private int CLNUM { get; set; }
+    private Users currentUser { get; set; } = new Users();
+    private List<Users> users;
+
     protected override async Task OnInitializedAsync()
     {
-        users = _cuser.GetUsers();
         CLNUM = UserProvider.CurrentClientNum;
-        currentUser = users?.FirstOrDefault(x => x.id == UserProvider?.CurrentUser?.id);
-        
+        currentUser = UserProvider.CurrentUser;
+
+        if (total != null)
+        {
+            total.ClNum = CLNUM;
+            total.user = currentUser;
+        }
+
+        users = _cuser.GetUsers();
+        if (currentUser != null) currentUser = users?.FirstOrDefault(x => x.id == currentUser.id);
+
         await base.OnInitializedAsync();
     }
 
-    void OnChanged()
+    private async Task OnChanged()
     {
-        _appStatus.clnum = CLNUM;
-        _appStatus.UpdateState();
-
         UserProvider.CurrentClientNum = CLNUM;
         UserProvider.CurrentUser = currentUser;
         UserProvider.SaveChangesAsync();
+
+
+        _appStatus.clnum = CLNUM;
+        //_appStatus.UpdateState();
+
+        total.ClNum = CLNUM;
+        total.user = currentUser;
+
+        int r =  (int)(100 * new Random().Next());
+        NavigationManager.NavigateTo($"/mudpage/{r}");
     }
 
     

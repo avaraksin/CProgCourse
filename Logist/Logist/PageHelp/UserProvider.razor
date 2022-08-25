@@ -16,9 +16,12 @@
 @code {
     private bool isLoaded;
 
+    [Parameter]
     public int CurrentClientNum { get; set; }
+    [Parameter]
     public Users? CurrentUser { get; set; }
-    public int ListId { get; set; }
+    [Parameter]
+    public int ListId { get; set; } = 1;
 
 
 
@@ -31,7 +34,11 @@
         CurrentClientNum = result.Success ? result.Value : 0;
 
         result = await ProtectedSessionStore.GetAsync<int>("listid");
-        ListId = result.Success ? result.Value : 0;
+        ListId = result.Success ? result.Value : 1;
+        if (ListId == 0)
+        {
+            ListId = 1;
+        }
 
         var uresult = await ProtectedSessionStore.GetAsync<Users>("user");
         CurrentUser = uresult.Success ? uresult.Value : null;

@@ -8,6 +8,7 @@ namespace Logist.Data
         public AppFactory(DbContextOptions<AppFactory> options)
             : base(options) { }
 
+        public DbSet<ClientTab> ClientTab { get; set; }
         public DbSet<Lists>? lists { get; set; }
         public DbSet<Listname>? listname { get; set; }
         public DbSet<Users> users { get; set; }

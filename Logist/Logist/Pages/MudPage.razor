@@ -13,7 +13,7 @@
 <h3>Справочники</h3>
 
 
-@if (lst == null)
+@if (lst == null || lst.Count == 0)
 {
     return;
 }
@@ -53,6 +53,7 @@
     RowClassFunc="@SelectedRowClassFunc" T="Listname"
     Bordered="true"
     Striped="true"
+    Dense
     CustomHeader="true">
 
         <HeaderContent>
@@ -81,6 +82,8 @@
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
+    private int ClNum { get; set; }
+
     List<Lists> lst = new List<Lists>();
     Lists? listSelected { get; set; } 
 
@@ -91,31 +94,53 @@
 
     // ***********************************************
 
-    [CascadingParameter]
-    public TotalProvider? total { get; set; }
+
     private Users currentUser = new();
 
     protected override Task OnInitializedAsync()
     {
-       return base.OnInitializedAsync();
+        if (UserProvider != null)
+        {
+            ClNum = UserProvider.CurrentClientNum;
+
+            lst = _clists?.GetLists(ClNum);
+            listSelected = _clists?.GetLists(ClNum, UserProvider.ListId > 0 ? UserProvider.ListId : 1);
+            ln = _cln.GetListname(ClNum, listSelected != null ? listSelected.id : 1);
+        }
+        else
+        {
+            ClNum = 0;
+            lst = _clists?.GetLists(ClNum);
+            listSelected = _clists?.GetLists(ClNum, 1);
+            ln = _cln.GetListname(ClNum, 1);
+        }
+        currentUser = UserProvider.CurrentUser;
+
+        return base.OnInitializedAsync();
     }
 
     protected override Task OnParametersSetAsync()
     {
-        lst = _clists?.GetLists(UserProvider != null ? UserProvider.CurrentClientNum : 1);
-        if (listSelected == null) listSelected = lst?.First(x => x.id == 1);
-
-        if (listSelected != null) ln = _cln.GetListname(UserProvider.CurrentClientNum, listSelected.id);
-
+        ClNum = UserProvider.CurrentClientNum;
         currentUser = UserProvider.CurrentUser;
+        
+        Refresh();
         return base.OnParametersSetAsync();
     }
 
-
-    async Task OnChanged()
+    private void Refresh()
     {
-        await OnInitializedAsync();
-        Console.WriteLine("Selectrd Value: " + listSelected.id); 
+        lst = _clists?.GetLists(ClNum);
+        if (listSelected == null && lst?.Count > 0) listSelected = lst.First(x => x.clnum == ClNum && x.id == UserProvider.ListId);
+        ln = _cln.GetListname(ClNum, listSelected != null ? listSelected.id : 1);
+    }
+
+
+    private async Task OnChanged()
+    {
+        UserProvider.ListId = listSelected.id;
+        UserProvider.SaveChangesAsync();
+        Refresh();
     }
 
     private string SelectedRowClassFunc(Listname element, int rowNumber)

@@ -1,13 +1,53 @@
 ﻿@page "/"
 
-@using MudBlazor
+@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using Logist.PageHelp
 
 <h3>Логистика</h3>
+@if (userProvider.CurrentClientNum == 0)
+{
+    <MudPaper Height = "400" Width = "90%">
+    <MudGrid>
+    <MudItem xs="12" sm="7">
+        <MudPaper Class="pa-4" Width = "20%">
+            
+                    <MudTextField T="string" Label="Имя" Required="false"/>
+                    <MudTextField @bind-IsValid = "@success" T="string" Label="Email" Required="true" RequiredError="Обязательное поле!"
+                                  Validation="@(new Func<string, bool>(IsValid))"
+                                  ValueChanged = "@(async () => EmailChanged())"  @ref="emailField"/>
+                    
+           
+        </MudPaper>
+        
+    </MudItem>
+    <MudItem xs="12" sm="5">
+        <MudPaper Class="pa-4 mud-height-full">
+            <MudImage Src="Resource/Logist.jpg" Alt = "img" Elevation="25" Class="rounded-lg"/>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
 
-<div class="d-flex justify-center">
-<MudImage Src="Resource/Logist.jpg" Alt = "img" Elevation="25" Class="rounded-lg"/>
-</div>
-
+</MudPaper>
+}
 @code{
- 
+
+    [CascadingParameter]
+    private UserProvider? userProvider { get; set; }
+
+    bool success;
+    MudTextField<string> emailField;
+   
+
+    private async Task EmailChanged()
+    {
+        if (IsValid(emailField.Value))
+            Console.WriteLine(emailField.Value);
+    }
+
+    private bool IsValid(string arg)
+    {
+        return new EmailAddressAttribute().IsValid(arg);
+    }
+
 }

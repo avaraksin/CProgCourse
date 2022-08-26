@@ -12,45 +12,27 @@
 <PageTitle>Logist</PageTitle>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
+    
     <main>
-        <div class="top-row">
-<!-- ************************************************************************************************** -->      
-        <MudPaper Height="50px" Width="300px" Elevation="1">
-            <MudSelect Margin="MudBlazor.Margin.Dense" T="Users" Label="Укажите Пользователя" 
-                Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" FullWidth = "false"
-                @bind-Value="@currentUser" SelectedValuesChanged = "@OnChanged">
-        @foreach (var u in users)
-        {
-            <MudSelectItem T="Users" Value="@u">@u.Shortname</MudSelectItem>
-        }
-        </MudSelect></MudPaper>
 
+        <MudAppBar Color="Color.Info" Fixed="false" Elevation="0" >
+        <MudGrid Spacing="@spacing" Justify="Justify.FlexStart">
+        <MudItem>
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+    </MudItem>
+<MudItem>
+    
+    <MudTextField  Label="Email Address"  @bind-Value="email"   Clearable Variant="Variant.Text" />
+    
+    
+    </MudItem>
+   </MudGrid>
+        </MudAppBar> 
 
-        <MudPaper Height="50px" Width="300px" Elevation="1">
-            <MudSelect Margin="MudBlazor.Margin.Dense" T="int" Label="Укажите номер клиента" 
-                Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter" FullWidth = "false"
-                @bind-Value="@CLNUM" SelectedValuesChanged = "@OnChanged">
-        @for (int i = 1; i <=6; i++)
-        {
-            int index = i;
-            <MudSelectItem T="int" Value="@index" />
-        }
-
-
-        </MudSelect></MudPaper>
-<!-- ************************************************************************************************** -->
-        </div>
-
-        <TotalProvider @ref = "total">
         <article class="content px-4">
             @Body
         </article>
-        </TotalProvider>
-
+        
 
         <MudThemeProvider/>
         <MudDialogProvider/>
@@ -61,30 +43,25 @@
 
 
 @code {
+    private int spacing { get; set; } = 2;
+    
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
-
-    private TotalProvider total { get; set; } = new TotalProvider();
-
-
 
     private int CLNUM { get; set; }
     private Users currentUser { get; set; } = new Users();
     private List<Users> users;
+
+    public string email;
+    //public IMask emailMask = RegexMask.Email();
 
     protected override async Task OnInitializedAsync()
     {
         CLNUM = UserProvider.CurrentClientNum;
         currentUser = UserProvider.CurrentUser;
 
-        if (total != null)
-        {
-            total.ClNum = CLNUM;
-            total.user = currentUser;
-        }
-
-        users = _cuser.GetUsers();
-        if (currentUser != null) currentUser = users?.FirstOrDefault(x => x.id == currentUser.id);
+        //users = _cuser.GetUsers();
+        //if (currentUser != null) currentUser = users?.FirstOrDefault(x => x.id == currentUser.id);
 
         await base.OnInitializedAsync();
     }
@@ -98,9 +75,6 @@
 
         _appStatus.clnum = CLNUM;
         //_appStatus.UpdateState();
-
-        total.ClNum = CLNUM;
-        total.user = currentUser;
 
         int r =  (int)(100 * new Random().Next());
         NavigationManager.NavigateTo($"/mudpage/{r}");

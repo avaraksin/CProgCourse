@@ -2,7 +2,13 @@
 
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@using System.Threading
 @using Logist.PageHelp
+
+@inject ISnackbar Snackbar
+@inject ProgramLogin _programLogin
+@inject CtrlUsers _users
+@inject NavigationManager navigateManager
 
 <h3>Логистика</h3>
 @if (userProvider.CurrentClientNum == 0)
@@ -10,13 +16,62 @@
     <MudPaper Height = "400" Width = "90%">
     <MudGrid>
     <MudItem xs="12" sm="7">
-        <MudPaper Class="pa-4" Width = "20%">
-            
-                    <MudTextField T="string" Label="Имя" Required="false"/>
-                    <MudTextField @bind-IsValid = "@success" T="string" Label="Email" Required="true" RequiredError="Обязательное поле!"
-                                  Validation="@(new Func<string, bool>(IsValid))"
-                                  ValueChanged = "@(async () => EmailChanged())"  @ref="emailField"/>
+        <MudPaper Class="pa-4" Width = "90%">
+                    <MudGrid>
+                    <MudItem><MudFab StartIcon="@Icons.Filled.Add" Label="Приесоединиться" OnClick = "@(() => SignUp(1))"/></MudItem>
+                    <MudItem><MudFab StartIcon="@Icons.Filled.AccountCircle" Label="Войти" OnClick = "@(() => SignUp(2))"/></MudItem>
+                    </MudGrid>
+                @if (LevelIn == 1)
+                {
+                    <p> </p>
+                    <MudForm @bind-IsValid="@success">
+                    <MudTextField T="string" Label="Username" Required="true" @ref="@uname" RequiredError="User name is required!"/>
+                    <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @ref = "@newEmail"
+                                  Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})"/>
+                    <MudTextField T="string" Label="Password"  @ref="pwField1"
+                                  InputType="InputType.Password"
+                                  Required="false"
+                                  HelperText="Пароль (не обязательно)"/>
+                    <MudTextField T="string" @ref = "pwField2"
+                                  Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
+                                  Validation="@(new Func<string, string>(PasswordMatch))"/>
                     
+                    <div class="d-flex align-center justify-space-between">
+                        <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="Даю свое согласие на обработку персональных данных"  />
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick = "@NewRegister">Зарегистрировать</MudButton>
+                    </div>
+                    </MudForm>
+                }
+                @if (LevelIn == 2)
+                {
+                    <p> </p><p> </p>
+                    
+                    <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" @ref="@emailField"
+                                  Validation="@(new Func<string, bool>(IsEmailValid))" ValueChanged = "@(() => EmailChanged(emailField.Value))"/>
+                    <p></p>
+                    @if (pwdOn)
+                    {
+                            <MudTextField T="string" Label="Password"  @ref="pwFieldPass" Immediate = "true"
+                                  InputType="InputType.Password" ValueChanged = "@PswChanged"
+                                  Required="@pwdOn" Disabled = "@(!pwdOn)"/><p> </p>
+                    }
+
+                    @if (userRequired)
+                    {
+                        <p> </p>
+                            <MudTextField T="string" HelperText="ID пользователя" Immediate="true" Label="ID пользователя" 
+                                    Variant="Variant.Text" @ref = "@userid" Required = "true" 
+                                    Validation = "@(int.TryParse(userid.Value, out _) == true)" 
+                                    ValueChanged = "@UseridChanged"/>
+                            <MudTextField T="string" Label="Password"  @ref="pwFieldUser" Immediate = "true"
+                                  InputType="InputType.Password"
+                                  /><p> </p>
+                    }
+
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick = "@SignIn">Войти</MudButton>
+                   
+                }
+
            
         </MudPaper>
         
@@ -35,19 +90,162 @@
     [CascadingParameter]
     private UserProvider? userProvider { get; set; }
 
-    bool success;
-    MudTextField<string> emailField;
-   
+    private int LevelIn { get; set; } = 0;
 
-    private async Task EmailChanged()
+
+    private MudTextField<string> pwField1, pwField2, pwFieldPass = new(), pwFieldUser;
+    MudTextField<string> uname;
+
+    MudTextField<string> userid = new();
+    MudTextField<string> newEmail;
+
+
+    bool success, pwdOn;
+    MudTextField<string> emailField;
+    bool userRequired = false;
+
+    // Флаги изменений полей
+    bool levelChanged = false;
+    bool emailChange = false;
+
+    ClientTab clientTab;
+    int uid = 0; // User ID
+
+    private void SignUp(int action)
     {
-        if (IsValid(emailField.Value))
-            Console.WriteLine(emailField.Value);
+        success = false;
+        pwdOn = false;
+        levelChanged = true;
+        userRequired = false;
+        LevelIn = action;
     }
 
-    private bool IsValid(string arg)
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (levelChanged &&  LevelIn == 2)
+        {
+            emailField.FocusAsync();
+            levelChanged = false;
+        }
+        if (emailChange && pwdOn)
+        {
+            pwFieldPass.FocusAsync();
+            emailChange = false;
+        }
+
+        if (emailChange && userRequired)
+        {
+            userid.FocusAsync();
+            emailChange = false;
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    private void SignIn()
+    {
+        if (clientTab != null)
+        {
+            if (!userRequired & (string.IsNullOrWhiteSpace(clientTab.Pwd) ||
+                clientTab.Pwd == pwFieldPass.Value))
+            {
+                userProvider.CurrentUser = _users.GetUsers(clientTab.Id, uid);
+                userProvider.CurrentClientNum = clientTab.Id;
+                navigateManager.NavigateTo("/mudpage/1");
+            }
+
+            if (userRequired)
+            {
+                var currentUser = _users.GetUsers(clientTab.Id, uid);
+                if ( (string.IsNullOrWhiteSpace(currentUser.Pass) && string.IsNullOrWhiteSpace(userid.Value)) ||
+                    currentUser.Pass == pwFieldUser.Value)
+                {
+                    userProvider.CurrentUser = currentUser;
+                    userProvider.CurrentClientNum = clientTab.Id;
+                    navigateManager.NavigateTo("/mudpage/1");
+                }
+            }
+        }
+    }
+
+    private void NewRegister()
+    {
+        if (PasswordMatch(pwField2.Value) != null)
+        {
+            Snackbar.Add( "Пароли не совпадают!", Severity.Error);
+            pwField2.FocusAsync();
+            return;
+        }
+
+        if (_programLogin.IsClient(newEmail.Value, out _))
+        {
+            Snackbar.Add( $"Email {newEmail.Value} уже зарегистрирован в программе! Укаэите другой Email", Severity.Error);
+            newEmail.FocusAsync();
+            return;
+        }
+
+        _programLogin.SetNewClient(uname.Value, newEmail.Value, string.IsNullOrWhiteSpace(pwField1.Value) ? null : pwField1.Value);
+        LevelIn = 2;
+
+    }
+
+    private void EmailChanged(string email)
+    {
+        if (!IsEmailValid(emailField.Value))
+        {
+            return;
+        }
+
+        bool isLogin = _programLogin.IsClient(email, out clientTab);
+        if (!isLogin)
+        {
+            Snackbar.Add( $"Email не найден! \nВозможно, вы не зарегистрированы в программе.", Severity.Error);
+            return;
+        }
+
+        int userCount = clientTab.users.Where(u => u.id > 0).Count();
+        emailChange = true;
+
+        if (userCount == 0)
+        {
+            if (string.IsNullOrWhiteSpace(clientTab.Pwd))
+            {
+                success = true;
+                return;
+            }
+
+            pwdOn = true;
+
+            userRequired = false;
+            return;
+        }
+
+        pwdOn = false;
+        userRequired = true;
+    }
+
+    private void PswChanged()
+    {
+        success = pwFieldPass.Value.Length > 0;
+    }
+
+    private void UseridChanged()
+    {
+        bool correctUserid = int.TryParse(userid.Value, out uid);
+
+        success = correctUserid && uid >= 0;
+    }
+
+    private bool IsEmailValid(string arg)
     {
         return new EmailAddressAttribute().IsValid(arg);
+    }
+
+    private string PasswordMatch(string arg)
+    {
+        if (pwField1.Value != arg)
+            return "Passwords don't match";
+        return null;
     }
 
 }

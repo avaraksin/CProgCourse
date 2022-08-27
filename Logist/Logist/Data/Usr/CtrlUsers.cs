@@ -10,12 +10,12 @@ namespace Logist.Data.Usr
         {
             _context = dbContext.CreateDbContext();
         }
-        public List<Users>? GetUsers()
+        public List<Users>? GetUsers(int clnum)
         {
             List<Users>? usr = null;
             try
             {
-                usr = _context.users.Where(u => u.clnum == ClNum.clnum && u.isdel == 0)
+                usr = _context.users.Where(u => u.clnum == clnum && u.isdel == 0)
                     .OrderBy(u => u.id)
                     .ToList();
                 if (usr == null)
@@ -31,12 +31,12 @@ namespace Logist.Data.Usr
             return usr;
         }
 
-        public Users? GetUsers(int id)
+        public Users? GetUsers(int clnum, int id)
         {
             Users? usr = null;
             try
             {
-                usr = _context.users.FirstOrDefault(u => u.clnum == ClNum.clnum && u.id == id && u.isdel == 0);
+                usr = _context.users.FirstOrDefault(u => u.clnum == clnum && u.id == id && u.isdel == 0);
                 if (usr == null)
                 {
                     usr = new Users();

@@ -18,6 +18,7 @@ builder.Services.AddScoped<ICtrlListname, CtrlListname>();
 builder.Services.AddScoped<ICtrlLists, CtrlLists>();
 builder.Services.AddScoped<AppStatus>();
 builder.Services.AddScoped<CtrlUsers>();
+builder.Services.AddScoped<ProgramLogin>();
 
 builder.Services.AddDbContextFactory<AppFactory>(
         options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));

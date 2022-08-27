@@ -12,6 +12,7 @@ namespace Logist.Data
         public DbSet<Lists>? lists { get; set; }
         public DbSet<Listname>? listname { get; set; }
         public DbSet<Users> users { get; set; }
+        
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,6 +30,8 @@ namespace Logist.Data
                 entity.HasKey(c => new { c.Idlist, c.id, c.id2, c.clnum });
                 entity.HasOne(l => l.user).WithMany().HasForeignKey(l => new { l.clnum, l.cuser }).HasPrincipalKey(l => new { l.clnum, l.id });
             });
+
+            modelBuilder.Entity<ClientTab>().HasMany(c => c.users).WithOne().HasForeignKey(u => new {u.clnum});
         }
 
     }

@@ -15,13 +15,32 @@
     
     <main>
 
-        <MudAppBar Color="Color.Info" Fixed="false" Elevation="0" >
+        <MudAppBar Color="Color.Info" Fixed="false" Elevation="0" Dense = "true">
         <MudGrid Spacing="@spacing" Justify="Justify.FlexStart">
         <MudItem>
-    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-    </MudItem>
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" /> </MudItem>
+        </MudGrid>
+        <MudSpacer/>
+        @if (UserProvider != null)
+        {
+            <MudGrid Spacing="@spacing" Justify="Justify.FlexEnd">
+            @if (UserProvider.CurrentBase != null)
+            {
+                <div class="d-flex justify-center align-center">
+                    <MudItem ><MudText>База: <b>@(UserProvider.CurrentBase?.ClientName). </b></MudText> </MudItem>
+                </div>
+            }    
+            @if (UserProvider.CurrentUser != null)   
+            {
+                <div class="d-flex justify-center align-center">
+                <MudItem><MudText> &nbsp;&nbsp;&nbsp;Пользователь: <b>@(UserProvider.CurrentUser?.name).</b></MudText></MudItem>
+                </div>
+            }
+            </MudGrid>
+        }
+               
 
-   </MudGrid>
+   
         </MudAppBar> 
 
         <article class="content px-4">

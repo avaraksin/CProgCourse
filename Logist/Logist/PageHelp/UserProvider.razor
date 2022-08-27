@@ -22,6 +22,8 @@
     public Users? CurrentUser { get; set; }
     [Parameter]
     public int ListId { get; set; } = 1;
+    [Parameter]
+    public ClientTab? CurrentBase { get; set; }
 
 
 
@@ -43,15 +45,20 @@
         var uresult = await ProtectedSessionStore.GetAsync<Users>("user");
         CurrentUser = uresult.Success ? uresult.Value : null;
 
+        var bresult = await ProtectedSessionStore.GetAsync<ClientTab>("base");
+        CurrentBase = bresult.Success ? bresult.Value : null;
+
+
         isLoaded = true;
     }
 
-   
+
     public async Task SaveChangesAsync()
     {
         await ProtectedSessionStore.SetAsync("clnum", CurrentClientNum);
         await ProtectedSessionStore.SetAsync("listid", ListId);
         await ProtectedSessionStore.SetAsync("user", CurrentUser);
+        await ProtectedSessionStore.SetAsync("base", CurrentBase);
     }
 
 }

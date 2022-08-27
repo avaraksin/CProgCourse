@@ -151,6 +151,8 @@
             {
                 userProvider.CurrentUser = _users.GetUsers(clientTab.Id, uid);
                 userProvider.CurrentClientNum = clientTab.Id;
+                userProvider.CurrentBase = clientTab;
+                userProvider.SaveChangesAsync();
                 navigateManager.NavigateTo("/mudpage/1");
             }
 
@@ -162,6 +164,8 @@
                 {
                     userProvider.CurrentUser = currentUser;
                     userProvider.CurrentClientNum = clientTab.Id;
+                    userProvider.CurrentBase = clientTab;
+                    userProvider.SaveChangesAsync();
                     navigateManager.NavigateTo("/mudpage/1");
                 }
             }
@@ -179,7 +183,7 @@
 
         if (_programLogin.IsClient(newEmail.Value, out _))
         {
-            Snackbar.Add( $"Email {newEmail.Value} уже зарегистрирован в программе! Укаэите другой Email", Severity.Error);
+            Snackbar.Add( $"Email {newEmail.Value} уже зарегистрирован в программе! Укажите другой Email", Severity.Error);
             newEmail.FocusAsync();
             return;
         }

@@ -7,20 +7,28 @@
 @inject CtrlUsers _cuser
 
 
-
+<MudLayout>
 
 <PageTitle>Logist</PageTitle>
 
 <div class="page">
     
     <main>
-
+        <MudDrawerContainer Class="mud-height-full">
         <MudAppBar Color="Color.Info" Fixed="false" Elevation="0" Dense = "true">
         <MudGrid Spacing="@spacing" Justify="Justify.FlexStart">
         <MudItem>
-    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" /> </MudItem>
-        </MudGrid>
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick = "@ControlDrawer"/> </MudItem>
+        
+        @if (true)
+        {
+            <MudItem><MudFab Color="MudBlazor.Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" OnClick = "@(x => {UserProvider.newItem = 1; NavigationManager.NavigateTo("/mudpage/2");})"/></MudItem>
+            <MudItem><MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" /></MudItem>
+            <MudItem><MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" /></MudItem>          
+        }
+     </MudGrid>   
         <MudSpacer/>
+        
         @if (UserProvider != null)
         {
             <MudGrid Spacing="@spacing" Justify="Justify.FlexEnd">
@@ -42,25 +50,48 @@
 
    
         </MudAppBar> 
-
-        <article class="content px-4">
+        
+        <MudDrawer @bind-Open="@open" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+        
+        <MudNavMenu>
+            <MudNavMenu>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Home" Href = "/">Главная</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.LibraryBooks">Library</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Group">Community</MudNavLink>
+            </MudNavMenu>
+        </MudNavMenu>
+       
+    </MudDrawer>
+   
+        <div >
+        <!--article class="content px-4"-->
             @Body
-        </article>
+        <!--/!--article -->
+        </div>
         
 
         <MudThemeProvider/>
         <MudDialogProvider/>
         <MudSnackbarProvider/>
+         </MudDrawerContainer>
     </main>
 </div>
 
-
+</MudLayout>
 
 @code {
-    private int spacing { get; set; } = 2;
-    
+    private int spacing { get; set; } = 1;
+    private bool open { get; set; }
+
+
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
+
+    [Parameter]
+    public int newItem { get; set; }
+
+    void ControlDrawer() => open = !open;
+    
 
     private int CLNUM { get; set; }
     private Users currentUser { get; set; } = new Users();

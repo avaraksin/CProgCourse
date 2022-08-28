@@ -82,6 +82,7 @@
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
+
     private int ClNum { get; set; }
 
     List<Lists> lst = new List<Lists>();
@@ -123,7 +124,13 @@
     {
         ClNum = UserProvider.CurrentClientNum;
         currentUser = UserProvider.CurrentUser;
-        
+
+        if (UserProvider.newItem == 1)
+        {
+            CorrectElement(null);
+            return Task.CompletedTask;
+        }
+
         Refresh();
         return base.OnParametersSetAsync();
     }
@@ -167,8 +174,8 @@
 
     async Task CorrectElement(Listname? correctItem)
     {
-        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        DialogParameters param = new DialogParameters();
+        //DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+        //DialogParameters param = new DialogParameters();
 
         if (correctItem == null)
         {
@@ -176,29 +183,32 @@
             correctItem.id = 0;
             correctItem.Idlist = listSelected.id;
             correctItem.clnum = listSelected.clnum;
-            
+
         }
         correctItem.cuser = currentUser.id;
 
-        param.Add("Item", correctItem);
-        var dialog = DialogService.Show<Dialog>(correctItem.id == 0 ? "Новый элемент" : "Редактирование справочников", param, closeOnEscapeKey);
-        var result = await dialog.Result;
+        await _cln.CorrectElement(correctItem);
 
-        if (!result.Cancelled)
-        {
 
-            var changeResult = _cln.AddListname(correctItem);
+        //param.Add("Item", correctItem);
+        //var dialog = DialogService.Show<Dialog>(correctItem.id == 0 ? "Новый элемент" : "Редактирование справочников", param, closeOnEscapeKey);
+        //var result = await dialog.Result;
 
-            if (changeResult)
-            {
-                Snackbar.Add( "Данные успешно сохранены!", Severity.Success );
-                await OnInitializedAsync();
-                return;
-            }
+        //if (!result.Cancelled)
+        //{
 
-            Snackbar.Add( "При сохранении данных возникла ошибка:\n" + _cln.ErrMessage, Severity.Error);
-            return;
-        }
+        //    var changeResult = _cln.AddListname(correctItem);
+
+        //    if (changeResult)
+        //    {
+        //        Snackbar.Add( "Данные успешно сохранены!", Severity.Success );
+        //        await OnInitializedAsync();
+        //        return;
+        //    }
+
+        //    Snackbar.Add( "При сохранении данных возникла ошибка:\n" + _cln.ErrMessage, Severity.Error);
+        //    return;
+        //}
     }
 
     async Task DelItem(Listname Item)

@@ -1,19 +1,26 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Logist.Interfaces;
-using Logist.Common;
+using Logist.PageHelp;
+
+using MudBlazor;
+using MudBlazor.Dialog;
 namespace Logist.Data
 {
     public class CtrlListname : ICtrlListname
     {
         private readonly AppFactory _dbContext;
+        private readonly IDialogService _dialogService;
+        private readonly ISnackbar Snackbar;
         //private readonly UserConnectionData? _userConnectionData;
         public string ErrMessage { get; set; }
 
-        public CtrlListname(IDbContextFactory<AppFactory> dbContext)
+        public CtrlListname(IDbContextFactory<AppFactory> dbContext, IDialogService dialogService, ISnackbar snackbar)
         {
             _dbContext = dbContext.CreateDbContext();
+            _dialogService = dialogService;
+            Snackbar = snackbar;
         }
-        
+
         public List<Listname>? GetListname(int clnum, int idList)
         {
             return _dbContext?.listname?.Where(l => l.clnum == clnum 
@@ -87,6 +94,31 @@ namespace Logist.Data
                 return false;
             }
             
+        }
+
+        public async Task CorrectElement(Listname correctItem)
+        {
+            DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+            DialogParameters param = new DialogParameters();
+
+            param.Add("Item", correctItem);
+            var dialog = _dialogService.Show<Dialog>(correctItem.id == 0 ? "Новый элемент" : "Редактирование справочников", param, closeOnEscapeKey);
+            var result = await dialog.Result;
+
+            if (!result.Cancelled)
+            {
+
+                var changeResult = AddListname(correctItem);
+
+                if (changeResult)
+                {
+                    Snackbar.Add("Данные успешно сохранены!", Severity.Success);
+                    return;
+                }
+
+                Snackbar.Add("При сохранении данных возникла ошибка:\n" + ErrMessage, Severity.Error);
+                return;
+            }
         }
     }
 }

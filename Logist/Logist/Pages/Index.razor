@@ -85,6 +85,11 @@
 
 </MudPaper>
 }
+else
+{
+    <MudItem><MudFab StartIcon="@Icons.Filled.ViewQuilt" Label="Выйти" OnClick = "@(async () => SignOut())"/></MudItem>
+}
+
 @code{
 
     [CascadingParameter]
@@ -146,7 +151,7 @@
     {
         if (clientTab != null)
         {
-            if (!userRequired & (string.IsNullOrWhiteSpace(clientTab.Pwd) ||
+            if (!userRequired && (string.IsNullOrWhiteSpace(clientTab.Pwd) ||
                 clientTab.Pwd == pwFieldPass.Value))
             {
                 userProvider.CurrentUser = _users.GetUsers(clientTab.Id, uid);
@@ -154,6 +159,12 @@
                 userProvider.CurrentBase = clientTab;
                 userProvider.SaveChangesAsync();
                 navigateManager.NavigateTo("/mudpage/1");
+            }
+            else if (!userRequired && clientTab.Pwd != pwFieldPass.Value)
+            {
+                Snackbar.Add( $"Неверный пароль!", Severity.Error);
+                pwFieldPass.FocusAsync();
+                return;
             }
 
             if (userRequired)
@@ -167,6 +178,12 @@
                     userProvider.CurrentBase = clientTab;
                     userProvider.SaveChangesAsync();
                     navigateManager.NavigateTo("/mudpage/1");
+                }
+                else
+                {
+                    Snackbar.Add( $"Неверный код пользователя или пароль!", Severity.Error);
+                    pwFieldUser.FocusAsync();
+                    return;
                 }
             }
         }
@@ -195,6 +212,9 @@
 
     private void EmailChanged(string email)
     {
+        success = false;
+        userRequired = false;
+
         if (!IsEmailValid(emailField.Value))
         {
             return;
@@ -250,6 +270,17 @@
         if (pwField1.Value != arg)
             return "Passwords don't match";
         return null;
+    }
+
+    private async Task SignOut()
+    {
+        if (userProvider != null)
+        {
+            userProvider.CurrentClientNum = 0;
+            userProvider.CurrentBase = null;
+            userProvider.CurrentUser = null;
+        }
+        navigateManager.NavigateTo("/");
     }
 
 }

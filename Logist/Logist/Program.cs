@@ -5,6 +5,7 @@ using Logist.Interfaces;
 using Logist.Common;
 using Microsoft.EntityFrameworkCore;
 
+using MudBlazor;
 using MudBlazor.Services;
 
 
@@ -23,12 +24,13 @@ builder.Services.AddScoped<ProgramLogin>();
 builder.Services.AddDbContextFactory<AppFactory>(
         options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));
 
-//builder.Services.AddDbContext<ApplicationDbContext>(
-//        options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));
-
 builder.Services.AddRazorPages();
 
-builder.Services.AddMudServices();
+builder.Services.AddMudServices(config =>
+    {
+        config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopCenter;
+    });
+
 
 var app = builder.Build();
 

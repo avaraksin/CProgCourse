@@ -10,14 +10,14 @@
     }
     else
     {
-        <p>Loading...</p>
+        <p>Чтение данных...</p>
     }
 
 @code {
     private bool isLoaded;
 
     [Parameter]
-    public int CurrentClientNum { get; set; }
+    public int CurrentClientNum { get; set; } = 0;
     [Parameter]
     public Users? CurrentUser { get; set; }
     [Parameter]
@@ -25,7 +25,16 @@
     [Parameter]
     public ClientTab? CurrentBase { get; set; }
     [Parameter]
-    public int newItem { get; set; }
+    public Listname? SelectedListname { get; set; }
+
+    [Parameter]
+    public bool DebugMode { get; set; } = false;
+
+    [Parameter]
+    public FormOnDisplay displayForm { get; set; } = FormOnDisplay.FormMain;
+
+    [Parameter]
+    public EventCallback OnDblClickCallback { get; set; }
 
 
     [Parameter]

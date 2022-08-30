@@ -9,6 +9,7 @@ namespace Logist.Interfaces
         public bool AddListname(Listname listname);
         public bool DeleteListname(Listname listname);
 
-        public Task CorrectElement(Listname correctItem);
+        public Task<bool> CorrectElement(Listname correctItem);
+        public Task<bool> DeleteItem(Listname Item);
     }
 }

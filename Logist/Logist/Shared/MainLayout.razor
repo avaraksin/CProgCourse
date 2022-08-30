@@ -1,30 +1,31 @@
 ﻿@using MudBlazor
 
 @inherits LayoutComponentBase
-@inject NavigationManager NavigationManager
+@inject NavigationManager navigationManager
 @inject AppStatus _appStatus
 
-@inject CtrlUsers _cuser
-
+@inject UserConnectionData userConnection
 
 <MudLayout>
 
 <PageTitle>Logist</PageTitle>
-
 <div class="page">
     
     <main>
         <MudDrawerContainer Class="mud-height-full">
-        <MudAppBar Color="Color.Info" Fixed="false" Elevation="0" Dense = "true">
+        <MudAppBar Color="Color.Info" Fixed="false" Elevation="0" Dense = "false">
         <MudGrid Spacing="@spacing" Justify="Justify.FlexStart">
         <MudItem>
     <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick = "@ControlDrawer"/> </MudItem>
         
         @if (true)
         {
-            <MudItem><MudFab Color="MudBlazor.Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" OnClick = "@(x => {UserProvider.newItem = 1; NavigationManager.NavigateTo("/mudpage/2");})"/></MudItem>
-            <MudItem><MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" /></MudItem>
-            <MudItem><MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" /></MudItem>          
+            <MudItem><MudFab Color="MudBlazor.Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" 
+                    OnClick = "@(async () => await AddElement())"/></MudItem>
+            <MudItem><MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" 
+                    OnClick = "@(async () => await CorrectElement())"/></MudItem>
+            <MudItem><MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small"
+                    OnClick = "@(async () => await DeleteElement())"/></MudItem>          
         }
      </MudGrid>   
         <MudSpacer/>
@@ -55,8 +56,8 @@
         
         <MudNavMenu>
             <MudNavMenu>
-                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Home" Href = "/">Главная</MudNavLink>
-                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.LibraryBooks">Library</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Home" IconColor = "@Color.Primary" Href = "/">Главная</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.List" IconColor = "@Color.Primary" Href="/mudpage/3">Справочники</MudNavLink>
                 <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Group">Community</MudNavLink>
             </MudNavMenu>
         </MudNavMenu>
@@ -79,6 +80,7 @@
 
 </MudLayout>
 
+
 @code {
     private int spacing { get; set; } = 1;
     private bool open { get; set; }
@@ -87,43 +89,83 @@
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
-    [Parameter]
-    public int newItem { get; set; }
-
     void ControlDrawer() => open = !open;
-    
+
 
     private int CLNUM { get; set; }
     private Users currentUser { get; set; } = new Users();
     private List<Users> users;
 
-    public string email;
-    //public IMask emailMask = RegexMask.Email();
 
     protected override async Task OnInitializedAsync()
     {
         CLNUM = UserProvider.CurrentClientNum;
         currentUser = UserProvider.CurrentUser;
 
-        //users = _cuser.GetUsers();
-        //if (currentUser != null) currentUser = users?.FirstOrDefault(x => x.id == currentUser.id);
-
         await base.OnInitializedAsync();
     }
 
-    private async Task OnChanged()
+    public async Task AddElement()
     {
-        UserProvider.CurrentClientNum = CLNUM;
-        UserProvider.CurrentUser = currentUser;
-        UserProvider.SaveChangesAsync();
+        if (UserProvider == null)
+        {
+            return;
+        }
 
-
-        _appStatus.clnum = CLNUM;
-        //_appStatus.UpdateState();
-
-        int r =  (int)(100 * new Random().Next());
-        NavigationManager.NavigateTo($"/mudpage/{r}");
+        if (UserProvider.displayForm == FormOnDisplay.FormListname)
+        {
+            Listname listname = new()
+            {
+                clnum = UserProvider.CurrentBase.Id,
+                Idlist = UserProvider.ListId,
+                id = 0,
+                cuser = UserProvider.CurrentUser.id
+            };
+            if (await userConnection.CorrectElement(listname))
+            {
+                navigationManager.NavigateTo($"/mudpage/{(int) new Random().Next()}");
+            }
+        }
     }
 
-    
+    public async Task CorrectElement()
+    {
+        if (UserProvider == null)
+        {
+            return;
+        }
+
+        if (UserProvider.displayForm == FormOnDisplay.FormListname)
+        {
+            if (UserProvider.SelectedListname != null)
+            {
+                UserProvider.SelectedListname.cuser = UserProvider.CurrentUser.id;
+                if (await userConnection.CorrectElement(UserProvider.SelectedListname) )
+                {
+                    navigationManager.NavigateTo($"/mudpage/{(int) new Random().Next()}");
+                }
+            }
+            await Task.CompletedTask;
+        }
+    }
+
+    public async Task DeleteElement()
+    {
+        if (UserProvider == null)
+        {
+            return;
+        }
+
+        if (UserProvider.displayForm == FormOnDisplay.FormListname)
+        {
+            if (UserProvider.SelectedListname != null)
+            {
+                UserProvider.SelectedListname.cuser = UserProvider?.CurrentUser?.id;
+                if (await userConnection.DeleteElement(UserProvider?.SelectedListname))
+                {
+                     navigationManager.NavigateTo($"/mudpage/{(int) new Random().Next()}");
+                }
+            }
+        }
+    }
 }

@@ -54,7 +54,7 @@ namespace Logist.Data
 
             }
             
-            // Получаем текущего пользователя
+            // Получаем текущую дату
             
             listname.chdate = DateTime.Now;
 
@@ -96,7 +96,7 @@ namespace Logist.Data
             
         }
 
-        public async Task CorrectElement(Listname correctItem)
+        public async Task<bool> CorrectElement(Listname correctItem)
         {
             DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
             DialogParameters param = new DialogParameters();
@@ -113,12 +113,42 @@ namespace Logist.Data
                 if (changeResult)
                 {
                     Snackbar.Add("Данные успешно сохранены!", Severity.Success);
-                    return;
+                    return true;
                 }
 
                 Snackbar.Add("При сохранении данных возникла ошибка:\n" + ErrMessage, Severity.Error);
-                return;
+                return false;
             }
+            return false;
+        }
+
+        public async Task<bool> DeleteItem(Listname Item)
+        {
+            DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
+            DialogParameters param = new DialogParameters();
+
+            param.Add("name", Item.Name);
+
+            var dialog = _dialogService.Show<DelDialog>("Удаление элемента справочника", param, closeOnEscapeKey);
+            var result = await dialog.Result;
+
+            if (!result.Cancelled)
+            {
+                var delResult = DeleteListname(Item);
+
+                if (delResult)
+                {
+                    Snackbar.Add("Данные успешно удалены!", Severity.Success);
+                    await Task.CompletedTask;
+                    return true;
+                }
+
+                Snackbar.Add("При удалении данных возникла ошибка:\n" + ErrMessage, Severity.Error);
+                await Task.CompletedTask;
+                return false;
+            }
+
+            return false;
         }
     }
 }

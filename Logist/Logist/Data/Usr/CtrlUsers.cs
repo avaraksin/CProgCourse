@@ -50,17 +50,23 @@ namespace Logist.Data.Usr
             return usr;
         }
 
-        //public bool AddUsers(Users users)
-        //{
-        //    try
-        //    {
-        //        List<Users> usr = _context.users.Where(u => u.clnum == users.clnum).ToList();
-        //        if (users.id == -1)
-        //        {
-        //            users.id = usr.Max(u => u.id) + 1;
+        public bool UpdateUsers(Users users)
+        {
+            try
+            {
+                List<Users> usr = _context.users.Where(u => u.clnum == users.clnum).ToList();
+                if (users.id == -1)
+                {
+                    users.id = usr.Max(u => u.id) + 1;
+                    users.CrDate = DateTime.Now;
+                    users.chdate = DateTime.Now;
+                }
+            }
+            catch (Exception ex)
+            {
+            }
 
-        //        }
-        //    }
-        //}
+            return true;
+        }
     }
 }

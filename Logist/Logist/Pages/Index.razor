@@ -11,6 +11,20 @@
 @inject NavigationManager navigateManager
 
 <h3>Логистика</h3>
+
+@if (userProvider.DebugMode)
+{
+    _programLogin.IsClient("f_tiger@mail.ru", out var CurrentBase);
+    userProvider.CurrentBase = CurrentBase;
+
+    userProvider.CurrentClientNum = CurrentBase.Id;
+
+    userProvider.CurrentUser = _users.GetUsers(1, 2);
+
+    //navigateManager.NavigateTo("/");
+}
+
+
 @if (userProvider.CurrentClientNum == 0)
 {
     <MudPaper Height = "400" Width = "90%">

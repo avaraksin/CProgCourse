@@ -6,9 +6,7 @@
 
 @inject ICtrlLists? _clists
 @inject ICtrlListname _cln
-@inject IDialogService DialogService
-@inject ISnackbar Snackbar
-@inject AppStatus _appStatus
+@inject UserConnectionData userConnection
 
 <h3>Справочники</h3>
 
@@ -28,10 +26,7 @@
                 <MudSelectItem T="Lists" Value="@(l)">@l.Name</MudSelectItem>
             }
         </MudSelect></MudPaper>
-    <p></p>
-    <MudFab Color="MudBlazor.Color.Tertiary" StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(null))"/>
-    <MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" OnClick = "@(() => CorrectElement(mudTable.SelectedItem))"/>  
-    <MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small" OnClick = "@(() => DelItem(mudTable.SelectedItem))"/>
+    
     <p></p>
     <style>
         .selected {
@@ -49,7 +44,7 @@
     <MudTable Items="@ln" Hover="true" 
     Breakpoint="MudBlazor.Breakpoint.Sm" 
     @ref="mudTable" 
-    OnRowClick="RowClickEvent" ondblclick = "@(async () => await TableDblClick())"
+    OnRowClick="RowClickEvent" ondblclick = "@( (async() =>TableDblClick()))"
     RowClassFunc="@SelectedRowClassFunc" T="Listname"
     Bordered="true"
     Striped="true"
@@ -79,6 +74,9 @@
     [Parameter]
     public int Page { get; set;}
 
+    [Parameter]
+    public MudPage mudPage { get; set; } 
+
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
@@ -95,6 +93,9 @@
 
     // ***********************************************
 
+    [Parameter]
+    public EventCallback OnDblClickCallback { get; set; }
+
 
     private Users currentUser = new();
 
@@ -107,6 +108,8 @@
             lst = _clists?.GetLists(ClNum);
             listSelected = _clists?.GetLists(ClNum, UserProvider.ListId > 0 ? UserProvider.ListId : 1);
             ln = _cln.GetListname(ClNum, listSelected != null ? listSelected.id : 1);
+
+            UserProvider.displayForm = FormOnDisplay.FormListname;
         }
         else
         {
@@ -124,13 +127,6 @@
     {
         ClNum = UserProvider.CurrentClientNum;
         currentUser = UserProvider.CurrentUser;
-
-        if (UserProvider.newItem == 1)
-        {
-            CorrectElement(null);
-            return Task.CompletedTask;
-        }
-
         Refresh();
         return base.OnParametersSetAsync();
     }
@@ -140,6 +136,7 @@
         lst = _clists?.GetLists(ClNum);
         if (listSelected == null && lst?.Count > 0) listSelected = lst.First(x => x.clnum == ClNum && x.id == UserProvider.ListId);
         ln = _cln.GetListname(ClNum, listSelected != null ? listSelected.id : 1);
+        UserProvider.SelectedListname = null;
     }
 
 
@@ -169,78 +166,19 @@
     }
     private void RowClickEvent(TableRowClickEventArgs<Listname> tableRowClickEventArgs)
     {
-        Console.WriteLine(mudTable.SelectedItem.id.ToString());
+        UserProvider.SelectedListname = mudTable.SelectedItem;
     }
 
-    async Task CorrectElement(Listname? correctItem)
-    {
-        //DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        //DialogParameters param = new DialogParameters();
 
-        if (correctItem == null)
-        {
-            correctItem = new Listname();
-            correctItem.id = 0;
-            correctItem.Idlist = listSelected.id;
-            correctItem.clnum = listSelected.clnum;
-
-        }
-        correctItem.cuser = currentUser.id;
-
-        await _cln.CorrectElement(correctItem);
-
-
-        //param.Add("Item", correctItem);
-        //var dialog = DialogService.Show<Dialog>(correctItem.id == 0 ? "Новый элемент" : "Редактирование справочников", param, closeOnEscapeKey);
-        //var result = await dialog.Result;
-
-        //if (!result.Cancelled)
-        //{
-
-        //    var changeResult = _cln.AddListname(correctItem);
-
-        //    if (changeResult)
-        //    {
-        //        Snackbar.Add( "Данные успешно сохранены!", Severity.Success );
-        //        await OnInitializedAsync();
-        //        return;
-        //    }
-
-        //    Snackbar.Add( "При сохранении данных возникла ошибка:\n" + _cln.ErrMessage, Severity.Error);
-        //    return;
-        //}
-    }
-
-    async Task DelItem(Listname Item)
-    {
-        DialogOptions closeOnEscapeKey = new DialogOptions() { CloseOnEscapeKey = true };
-        DialogParameters param = new DialogParameters();
-
-        param.Add("name", Item.Name);
-
-        var dialog = DialogService.Show<DelDialog>("Удаление элемента справочника", param, closeOnEscapeKey);
-        var result = await dialog.Result;
-
-        if (!result.Cancelled)
-        {
-            var delResult = _cln.DeleteListname(Item);
-            
-            if (delResult)
-            {
-                Snackbar.Add( "Данные успешно удалены!", Severity.Success );
-                await OnInitializedAsync();
-                return;
-            }
-
-            Snackbar.Add( "При удалении данных возникла ошибка:\n" + _cln.ErrMessage, Severity.Error);
-            return;
-        }
-
-    }
 
     async Task TableDblClick()
     {
-        await CorrectElement(mudTable.SelectedItem);
+        UserProvider.SelectedListname.cuser = UserProvider.CurrentUser.id;
+        if (await userConnection.CorrectElement(mudTable.SelectedItem))
+        {
+            StateHasChanged();
+            Refresh();
+        }
     }
 
     string GetDateString(DateTime? dt)

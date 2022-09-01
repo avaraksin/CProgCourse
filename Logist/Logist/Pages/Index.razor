@@ -172,7 +172,7 @@ else
                 userProvider.CurrentClientNum = clientTab.Id;
                 userProvider.CurrentBase = clientTab;
                 userProvider.SaveChangesAsync();
-                navigateManager.NavigateTo("/mudpage/1");
+                navigateManager.NavigateTo("/listnamepage/1");
             }
             else if (!userRequired && clientTab.Pwd != pwFieldPass.Value)
             {
@@ -191,7 +191,7 @@ else
                     userProvider.CurrentClientNum = clientTab.Id;
                     userProvider.CurrentBase = clientTab;
                     userProvider.SaveChangesAsync();
-                    navigateManager.NavigateTo("/mudpage/1");
+                    navigateManager.NavigateTo("/listnamepage/1");
                 }
                 else
                 {

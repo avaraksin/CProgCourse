@@ -1,4 +1,4 @@
-﻿@page "/mudpage/{Page:int}"
+﻿@page "/listnamepage/{Page:int}"
 
 @using System;
 @using System.Globalization;
@@ -65,7 +65,7 @@
             <MudTd DataLabel="Наименование">@context.Name</MudTd>
             <MudTd DataLabel="Комментарий">@context.Comment</MudTd>
             <MudTd DataLabel="User">@context?.user?.Shortname</MudTd>
-            <MudTd DataLabel="Дата модификации">@GetDateString(context.chdate)</MudTd>
+            <MudTd DataLabel="Дата модификации">@Utils.GetDateString(context.chdate)</MudTd>
         </RowTemplate>
     </MudTable>
    
@@ -74,9 +74,7 @@
     [Parameter]
     public int Page { get; set;}
 
-    [Parameter]
-    public MudPage mudPage { get; set; } 
-
+    
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
@@ -181,9 +179,6 @@
         }
     }
 
-    string GetDateString(DateTime? dt)
-    {
-        return dt?.ToShortDateString();
-    }
+    
 
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Logist.Interfaces;
 using Logist.PageHelp;
+using Logist.Data.Usr;
 
 using MudBlazor;
 using MudBlazor.Dialog;
@@ -11,14 +12,16 @@ namespace Logist.Data
         private readonly AppFactory _dbContext;
         private readonly IDialogService _dialogService;
         private readonly ISnackbar Snackbar;
+        private readonly CtrlUsers _ctrlUsers;
         //private readonly UserConnectionData? _userConnectionData;
         public string ErrMessage { get; set; }
 
-        public CtrlListname(IDbContextFactory<AppFactory> dbContext, IDialogService dialogService, ISnackbar snackbar)
+        public CtrlListname(IDbContextFactory<AppFactory> dbContext, IDialogService dialogService, ISnackbar snackbar, CtrlUsers ctrlUsers)
         {
             _dbContext = dbContext.CreateDbContext();
             _dialogService = dialogService;
             Snackbar = snackbar;
+            _ctrlUsers = ctrlUsers;
         }
 
         public List<Listname>? GetListname(int clnum, int idList)
@@ -57,6 +60,11 @@ namespace Logist.Data
             // Получаем текущую дату
             
             listname.chdate = DateTime.Now;
+
+            if (listname.cuser != null)
+            {
+                listname.user = _ctrlUsers.GetUsers(listname.clnum, (int)listname.cuser);
+            }
 
             if (listname.id == 0) // Новый элемент
             {

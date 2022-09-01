@@ -28,7 +28,7 @@ namespace Logist.Data
                 entity.Property(e => e.Comment).IsRequired(false);
 
                 entity.HasKey(c => new { c.Idlist, c.id, c.id2, c.clnum });
-                entity.HasOne(l => l.user).WithMany().HasForeignKey(l => new { l.clnum, l.cuser }).HasPrincipalKey(l => new { l.clnum, l.id });
+                entity.HasOne(l => l.user).WithMany().HasForeignKey(l => new { l.clnum, l.cuser }).HasPrincipalKey(u => new {u.clnum, u.id });
             });
 
             modelBuilder.Entity<ClientTab>().HasMany(c => c.users).WithOne().HasForeignKey(u => new {u.clnum});

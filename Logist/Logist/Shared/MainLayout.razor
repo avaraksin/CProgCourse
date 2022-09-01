@@ -56,9 +56,9 @@
         
         <MudNavMenu>
             <MudNavMenu>
-                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Home" IconColor = "@Color.Primary" Href = "/">Главная</MudNavLink>
-                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.List" IconColor = "@Color.Primary" Href="/mudpage/3">Справочники</MudNavLink>
-                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Group">Community</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Home"  IconColor = "@Color.Primary" Href = "/">Главная</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.List"  IconColor = "@Color.Primary" Href="/listnamepage/3">Справочники</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Group" IconColor = "@Color.Primary" Href="/userpage/1">Пользователи</MudNavLink>
             </MudNavMenu>
         </MudNavMenu>
        
@@ -123,8 +123,25 @@
             };
             if (await userConnection.CorrectElement(listname))
             {
-                navigationManager.NavigateTo($"/mudpage/{(int) new Random().Next()}");
+                navigationManager.NavigateTo($"/listnamepage/{(int) new Random().Next()}");
             }
+        }
+        else if (UserProvider.displayForm == FormOnDisplay.FormUsers)
+        {
+            Users user = new()
+            {
+                clnum = UserProvider.CurrentBase.Id,
+                SECLEVEL = 1,
+                isdel = -1,
+                AdminUser = UserProvider.CurrentUser.Shortname,
+                cuser = UserProvider.CurrentUser.id
+            };
+            
+            if (await userConnection.CorrectElement(user))
+            {
+                navigationManager.NavigateTo($"/userpage/{(int) new Random().Next()}");
+            }
+
         }
     }
 
@@ -142,7 +159,7 @@
                 UserProvider.SelectedListname.cuser = UserProvider.CurrentUser.id;
                 if (await userConnection.CorrectElement(UserProvider.SelectedListname) )
                 {
-                    navigationManager.NavigateTo($"/mudpage/{(int) new Random().Next()}");
+                    navigationManager.NavigateTo($"/listnamepage/{(int) new Random().Next()}");
                 }
             }
             await Task.CompletedTask;
@@ -163,9 +180,26 @@
                 UserProvider.SelectedListname.cuser = UserProvider?.CurrentUser?.id;
                 if (await userConnection.DeleteElement(UserProvider?.SelectedListname))
                 {
-                     navigationManager.NavigateTo($"/mudpage/{(int) new Random().Next()}");
+                    navigationManager.NavigateTo($"/listnamepage/{(int) new Random().Next()}");
                 }
             }
         }
+        if (UserProvider.displayForm == FormOnDisplay.FormUsers)
+        {
+            if (UserProvider.SelectedUser != null)
+            {
+                UserProvider.SelectedUser.cuser = UserProvider?.CurrentUser?.id;
+                if (await userConnection.DeleteElement(UserProvider?.SelectedUser))
+                {
+                    navigationManager.NavigateTo($"/userpage/{(int) new Random().Next()}");
+                }
+            }
+        }
+
+    }
+
+    public async Task TestUserDialog()
+    {
+        await userConnection.CorrectElement(UserProvider.CurrentUser);
     }
 }

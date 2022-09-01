@@ -14,7 +14,12 @@
 @using Logist.Common
 @using Logist.Data
 @using Logist.Data.Usr
+@using Logist.Settings
 
 @using MudBlazor
 
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+
+@inject ISnackbar Snackbar
+@inject UserConnectionData userConnection

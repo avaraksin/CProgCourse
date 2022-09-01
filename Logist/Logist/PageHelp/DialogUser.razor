@@ -1,0 +1,51 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <DialogContent>
+        <div class="d-flex flex-column py-1">
+           
+                <MudTextField T="int"    Label="UserId"        @bind-Value = "@Item.id" Disabled = "@(Item.isdel != -1)"/>
+                <MudTextField T="string" Label="Полное имя."   @bind-Value= "@Item.name" @ref="@Shortname"/>
+                <MudTextField T="string" Label="Короткое имя." @bind-Value= "@Item.Shortname" />
+                <MudTextField T="string" Label="Пароль"        @bind-Value= "@Item.Pass" />
+
+                <MudSelect T="int?" @bind-Value="@Item.SECLEVEL">
+                @foreach (var item in UserSettings.privLevel)
+                {
+                    <MudSelectItem T="int?" Value = "@(UserSettings.privLevel.IndexOf(item))">@item</MudSelectItem>
+                }
+                </MudSelect>
+
+
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="@(() => OkBt())">Ok</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Close">Отмена</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public Users Item { get; set; }
+
+    private MudTextField<string> Shortname;
+
+    private async Task OkBt()
+    {
+        
+        if (Item.Shortname.Length == 0)
+        {
+            Snackbar.Add("Нельзя сохранить пустую строку!", Severity.Error);
+            Shortname.FocusAsync();
+            return;
+        }
+
+        
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    void Close() => MudDialog.Close(DialogResult.Ok(true));
+
+}

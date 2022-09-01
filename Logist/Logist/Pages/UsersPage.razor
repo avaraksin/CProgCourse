@@ -1,0 +1,118 @@
+﻿@page "/userpage/{Page:int}"
+
+@inject CtrlUsers _ctrlUsers
+
+<h3>Пользователи</h3>
+
+<p></p>
+    <style>
+        .selected {
+        background-color: #1E88E5 !important;
+        }
+
+        .selected > td {
+        color: white !important;
+        }
+
+        .selected > td .mud-input {
+        color: white !important;
+        }
+    </style>
+    <MudTable Items="@ulist" Hover="true" 
+    Breakpoint="MudBlazor.Breakpoint.Sm" 
+    @ref="mudTable" 
+    OnRowClick="RowClickEvent" 
+    RowClassFunc="@SelectedRowClassFunc" T="Users"
+    Bordered="true"
+    Striped="true"
+    ondblclick = "@(async () => TableDblClick())"
+    Dense
+    CustomHeader="true">
+
+        <HeaderContent>
+            <MudTHeadRow Class="header-centered">
+                <MudTh Class="header-centered">ID</MudTh>
+                <MudTh>Короткое имя</MudTh>
+                <MudTh>Полное имя</MudTh>
+                <MudTh>Уровень привилегий</MudTh>
+                <MudTh>Parent</MudTh>
+                <MudTh>Дата изменения</MudTh>
+            </MudTHeadRow>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@context.id</MudTd>
+            <MudTd DataLabel="Короткое имя">@context.Shortname</MudTd>
+            <MudTd DataLabel="Полное имя">@context.name</MudTd>
+            <MudTd DataLabel="Уровень привилегий">@UserSettings.privLevel[(int)context.SECLEVEL]</MudTd>
+            <MudTd DataLabel="Parent">@context.AdminUser</MudTd>
+            <MudTd DataLabel="Дата модификации">@Utils.GetDateString(context.chdate)</MudTd>
+        </RowTemplate>
+    </MudTable>
+
+@code {
+    [Parameter]
+    public int Page { get; set; }
+
+    [CascadingParameter]
+    public UserProvider userProvider { get; set; }
+
+    List<Users> ulist = new List<Users>();
+
+    private MudTable<Users> mudTable;
+    private int selectedRowNumber = -1;
+    private Users? selectedItem;
+
+    protected override Task OnInitializedAsync()
+    {
+        userProvider.displayForm = FormOnDisplay.FormUsers;
+        return base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Refresh();
+        await base.OnParametersSetAsync();
+    }
+
+
+    private async Task? Refresh()
+    {
+        if (userProvider != null && userProvider.CurrentBase != null)
+        {
+            ulist = _ctrlUsers.GetUsers((int)userProvider.CurrentBase?.Id).Where(x => x.id != 0).ToList();
+        }
+    }
+
+    private string SelectedRowClassFunc(Users element, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+        {
+            selectedRowNumber = rowNumber;
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+    private void RowClickEvent(TableRowClickEventArgs<Users> tableRowClickEventArgs)
+    {
+        userProvider.SelectedUser = mudTable.SelectedItem;
+    }
+
+    private async Task? TableDblClick()
+    {
+        userProvider.SelectedUser.cuser = userProvider.CurrentUser.id;
+        if (await userConnection.CorrectElement(mudTable.SelectedItem))
+        {
+            StateHasChanged();
+            await Refresh();
+        }
+    }
+
+}

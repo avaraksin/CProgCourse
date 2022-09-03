@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Logist.Data.Usr;
-using Logist.Data.Log;
+using Logist.Data.LogFolder;
 
 namespace Logist.Data
 {

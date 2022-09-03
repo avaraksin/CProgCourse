@@ -61,11 +61,6 @@ namespace Logist.Data
             
             listname.chdate = DateTime.Now;
 
-            if (listname.cuser != null)
-            {
-                listname.user = _ctrlUsers.GetUsers(listname.clnum, (int)listname.cuser);
-            }
-
             if (listname.id == 0) // Новый элемент
             {
 
@@ -76,7 +71,7 @@ namespace Logist.Data
             }
             else
             {
-                _dbContext.Entry(listname).State = EntityState.Modified;
+                //_dbContext.Entry(listname).State = EntityState.Modified;
                 //_dbContext.Entry(_dbContext.listname.FirstOrDefault(x => x.id == listname.id &&
                 //                                                        x.Idlist == listname.Idlist &&
                 //                                                        x.id2 == listname.id2 &&

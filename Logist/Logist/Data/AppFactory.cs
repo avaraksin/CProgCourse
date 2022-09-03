@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Logist.Data.Usr;
+using Logist.Data.Log;
 
 namespace Logist.Data
 {
@@ -12,13 +13,16 @@ namespace Logist.Data
         public DbSet<Lists>? lists { get; set; }
         public DbSet<Listname>? listname { get; set; }
         public DbSet<Users> users { get; set; }
-        
+        public DbSet<UserCond> userCond { get; set; }
+        public DbSet<LLog> lLog { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Lists>().HasKey(c => new { c.clnum, c.id });
             modelBuilder.Entity<Users>().HasKey(c => new { c.clnum, c.id });
+            modelBuilder.Entity<UserCond>().HasKey(c => new { c.clnum, c.idUser, c.idCond, c.id, c.id2 });
+            modelBuilder.Entity<LLog>().HasKey(c => new { c.clnum, c.id, c.LogDt });
 
             modelBuilder.Entity<Listname>(entity =>
             {

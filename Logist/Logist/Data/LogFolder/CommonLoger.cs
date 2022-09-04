@@ -15,13 +15,12 @@ namespace Logist.Data.LogFolder
     public class CommonLoger
     {
         private readonly AppFactory _context;
-        //private readonly IHttpContextAccessor _contextAccessor;
-        private readonly string? currentIP;
-
+        private readonly IHttpContextAccessor _contextAccessor;
+        
         public CommonLoger(IDbContextFactory<AppFactory> dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _context = dbContext.CreateDbContext();
-            currentIP = httpContextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString();
+            _contextAccessor = httpContextAccessor;
         }
 
         public async Task GetUser()
@@ -75,7 +74,7 @@ namespace Logist.Data.LogFolder
             {
                 LogDt = thisDate,
                 LogTime = DateTime.Now.ToString("HH.mm.ss"),
-                CompName = currentIP,
+                CompName = _contextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
 
                 clnum = clnum,
                 id = _context.lLog.Where(l => l.clnum == clnum && l.LogDt == thisDate).ToList().Count() == 0 ? 

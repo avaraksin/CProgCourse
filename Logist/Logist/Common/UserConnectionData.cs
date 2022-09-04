@@ -10,6 +10,7 @@ namespace Logist.Common
         FormListname    = 1,
         FormUsers       = 2
     }
+
     public class UserConnectionData
     {
 

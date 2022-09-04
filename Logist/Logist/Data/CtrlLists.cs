@@ -8,8 +8,6 @@ namespace Logist.Data
     public class CtrlLists : ICtrlLists
     {
         private readonly AppFactory? _dbContext;
-        private  int clnum;
-        //private readonly UserConnectionData? _userConnectionData;
         public CtrlLists(IDbContextFactory<AppFactory> dbContext)
         {
             //_userConnectionData = userConnectionData;

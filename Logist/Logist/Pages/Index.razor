@@ -52,7 +52,8 @@
                     
                     <div class="d-flex align-center justify-space-between">
                         <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="Даю свое согласие на обработку персональных данных"  />
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick = "@NewRegister">Зарегистрировать</MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick = "@(async () => await NewRegister())">
+                            Зарегистрировать</MudButton>
                     </div>
                     </MudForm>
                 }
@@ -130,6 +131,13 @@ else
     ClientTab clientTab;
     int uid = 0; // User ID
 
+    protected override async Task OnInitializedAsync()
+    {
+        userProvider.displayForm = FormOnDisplay.FormMain;
+        await _cLogger.SetNavigate(userProvider.CurrentClientNum, userProvider?.CurrentUser?.id, userProvider.displayForm);
+        await base.OnInitializedAsync();
+    }
+
     private void SignUp(int action)
     {
         success = false;
@@ -172,6 +180,9 @@ else
                 userProvider.CurrentClientNum = clientTab.Id;
                 userProvider.CurrentBase = clientTab;
                 userProvider.SaveChangesAsync();
+
+                _cLogger?.SetSignIn(clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
+
                 navigateManager.NavigateTo("/listnamepage/1");
             }
             else if (!userRequired && clientTab.Pwd != pwFieldPass.Value)
@@ -191,6 +202,7 @@ else
                     userProvider.CurrentClientNum = clientTab.Id;
                     userProvider.CurrentBase = clientTab;
                     userProvider.SaveChangesAsync();
+                    _cLogger?.SetSignIn(clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
                     navigateManager.NavigateTo("/listnamepage/1");
                 }
                 else
@@ -203,7 +215,7 @@ else
         }
     }
 
-    private void NewRegister()
+    private async Task NewRegister()
     {
         if (PasswordMatch(pwField2.Value) != null)
         {
@@ -220,6 +232,8 @@ else
         }
 
         _programLogin.SetNewClient(uname.Value, newEmail.Value, string.IsNullOrWhiteSpace(pwField1.Value) ? null : pwField1.Value);
+        
+        await _cLogger.SetRegistration(newEmail.Value, pwField1.Value, true);
         LevelIn = 2;
 
     }

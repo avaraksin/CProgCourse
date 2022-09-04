@@ -1,8 +1,12 @@
 ﻿@page "/"
 @namespace Logist.Pages
+@inject Logist.Data.LogFolder.CommonLoger _loger
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     Layout = "_Layout";
+
+    await _loger.GetUser();
 }
 
 <component type="typeof(App)" render-mode="Server" />

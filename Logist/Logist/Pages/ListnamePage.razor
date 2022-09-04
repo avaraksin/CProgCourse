@@ -91,13 +91,10 @@
 
     // ***********************************************
 
-    [Parameter]
-    public EventCallback OnDblClickCallback { get; set; }
-
-
+   
     private Users currentUser = new();
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         if (UserProvider != null)
         {
@@ -108,6 +105,8 @@
             ln = _cln.GetListname(ClNum, listSelected != null ? listSelected.id : 1);
 
             UserProvider.displayForm = FormOnDisplay.FormListname;
+
+            await _cLogger.SetNavigate(UserProvider.CurrentClientNum, UserProvider?.CurrentUser?.id, UserProvider.displayForm);
         }
         else
         {
@@ -118,7 +117,7 @@
         }
         currentUser = UserProvider.CurrentUser;
 
-        return base.OnInitializedAsync();
+        await base.OnInitializedAsync();
     }
 
     protected override Task OnParametersSetAsync()

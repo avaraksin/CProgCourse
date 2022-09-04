@@ -3,24 +3,27 @@ using Logist.Data;
 using Logist.Data.Usr;
 using Logist.Interfaces;
 using Logist.Common;
+using Logist.Data.LogFolder;
+
 using Microsoft.EntityFrameworkCore;
 
 using MudBlazor;
 using MudBlazor.Services;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddScoped<ICtrlListname, CtrlListname>();
 builder.Services.AddScoped<ICtrlLists, CtrlLists>();
 builder.Services.AddScoped<AppStatus>();
 builder.Services.AddScoped<CtrlUsers>();
 builder.Services.AddScoped<ProgramLogin>();
 builder.Services.AddScoped<UserConnectionData>();
+builder.Services.AddScoped<CommonLoger>();
 
 builder.Services.AddDbContextFactory<AppFactory>(
         options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));

@@ -25,14 +25,14 @@ namespace Logist.Data
             return client != null;
         }
 
-        public void SetNewClient(string userName, string email, string password)
+        public async Task SetNewClient(string userName, string email, string password)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
                 return;
             }
 
-            int newClnum = _dbContext.ClientTab.Count() == 0 ? 1 : _dbContext.ClientTab.Select(c => c.Id).Distinct().ToList().Max() + 1;
+            int newClnum = _dbContext.ClientTab.Count() + 1;
 
             ClientTab clientTab = new()
             {
@@ -41,8 +41,9 @@ namespace Logist.Data
                 Email = email,
                 Pwd = password
             };
-            _dbContext.ClientTab.Add(clientTab);
-            _dbContext.SaveChanges();
+            
+            await _dbContext.ClientTab.AddAsync(clientTab);
+            await _dbContext.SaveChangesAsync();
 
             var param = new Microsoft.Data.SqlClient.SqlParameter
             {
@@ -52,7 +53,7 @@ namespace Logist.Data
                 Size = sizeof(int),
                 Value = newClnum
             };
-            _dbContext.Database.ExecuteSqlRaw("InitNewClNum @clnum", param);
+            await _dbContext.Database.ExecuteSqlRawAsync("InitNewClNum @clnum", param);
 
         }
  

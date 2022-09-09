@@ -74,7 +74,7 @@
     [Parameter]
     public int Page { get; set;}
 
-    
+
     [CascadingParameter]
     private UserProvider? UserProvider { get; set; }
 
@@ -91,7 +91,7 @@
 
     // ***********************************************
 
-   
+
     private Users currentUser = new();
 
     protected override async Task OnInitializedAsync()
@@ -105,8 +105,8 @@
             ln = _cln.GetListname(ClNum, listSelected != null ? listSelected.id : 1);
 
             UserProvider.displayForm = FormOnDisplay.FormListname;
-
-            await _cLogger.SetNavigate(UserProvider.CurrentClientNum, UserProvider?.CurrentUser?.id, UserProvider.displayForm);
+            
+            await _cLogger.SetNavigate(UserProvider.CurrentIP, UserProvider.CurrentClientNum, UserProvider?.CurrentUser?.id, UserProvider.displayForm);
         }
         else
         {
@@ -140,7 +140,7 @@
     private async Task OnChanged()
     {
         UserProvider.ListId = listSelected.id;
-        UserProvider.SaveChangesAsync();
+        await UserProvider.SaveChangesAsync();
         Refresh();
     }
 

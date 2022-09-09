@@ -30,7 +30,7 @@
     public Users? SelectedUser { get; set; }
 
     [Parameter]
-    public object? CurrentObject { get; set; }
+    public string? CurrentIP { get; set; }
 
 
     [Parameter]
@@ -39,12 +39,13 @@
     [Parameter]
     public FormOnDisplay displayForm { get; set; } = FormOnDisplay.FormMain;
 
-    
+
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+
         var result = await ProtectedSessionStore.GetAsync<int>("clnum");
         CurrentClientNum = result.Success ? result.Value : 0;
 
@@ -61,6 +62,16 @@
         var bresult = await ProtectedSessionStore.GetAsync<ClientTab>("base");
         CurrentBase = bresult.Success ? bresult.Value : null;
 
+        var IPResult = await ProtectedSessionStore.GetAsync<string>("IP");
+        if (IPResult.Success == false)
+        {
+            CurrentIP = UserSettings.ClientIP;
+            await ProtectedSessionStore.SetAsync("IP", CurrentIP);
+        }
+        else
+        {
+            CurrentIP = IPResult.Value;
+        }
 
         isLoaded = true;
     }

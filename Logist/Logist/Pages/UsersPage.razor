@@ -65,7 +65,7 @@
     protected override async Task OnInitializedAsync()
     {
         userProvider.displayForm = FormOnDisplay.FormUsers;
-        await _cLogger.SetNavigate(userProvider.CurrentClientNum, userProvider?.CurrentUser?.id, userProvider.displayForm);
+        await _cLogger.SetNavigate(userProvider.CurrentIP, userProvider.CurrentClientNum, userProvider?.CurrentUser?.id, userProvider.displayForm);
         await base.OnInitializedAsync();
     }
 

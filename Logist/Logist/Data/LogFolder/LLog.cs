@@ -2,6 +2,10 @@
 {
     public class LLog
     {
+        public LLog()
+        {
+
+        }
         public DateTime LogDt { get; set; }
         public int id { get; set; }
         public int? ProgUser { get; set; }

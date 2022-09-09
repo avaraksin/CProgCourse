@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Logist.Data.Usr;
 using Logist.Data.LogFolder;
+using Logist.Data.MainData;
 
 namespace Logist.Data
 {
@@ -15,6 +16,7 @@ namespace Logist.Data
         public DbSet<Users> users { get; set; }
         public DbSet<UserCond> userCond { get; set; }
         public DbSet<LLog> lLog { get; set; }
+        public DbSet<LCust> lcust { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

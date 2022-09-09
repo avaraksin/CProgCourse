@@ -5,7 +5,6 @@
 @using System.Threading
 @using Logist.PageHelp
 
-@inject ISnackbar Snackbar
 @inject ProgramLogin _programLogin
 @inject CtrlUsers _users
 @inject NavigationManager navigateManager
@@ -83,7 +82,7 @@
                                   /><p> </p>
                     }
 
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick = "@SignIn">Войти</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" OnClick = "@(async () => await SignIn())">Войти</MudButton>
                    
                 }
 
@@ -102,7 +101,7 @@
 }
 else
 {
-    <MudItem><MudFab StartIcon="@Icons.Filled.ViewQuilt" Label="Выйти" OnClick = "@(async () => SignOut())"/></MudItem>
+    <MudItem><MudFab StartIcon="@Icons.Filled.ViewQuilt" Label="Выйти" OnClick = "@(async () => await SignOut())"/></MudItem>
 }
 
 @code{
@@ -134,7 +133,9 @@ else
     protected override async Task OnInitializedAsync()
     {
         userProvider.displayForm = FormOnDisplay.FormMain;
-        await _cLogger.SetNavigate(userProvider.CurrentClientNum, userProvider?.CurrentUser?.id, userProvider.displayForm);
+
+        await _cLogger.SetNavigate(userProvider.CurrentIP, userProvider.CurrentClientNum, userProvider?.CurrentUser?.id, userProvider.displayForm);
+
         await base.OnInitializedAsync();
     }
 
@@ -169,8 +170,10 @@ else
         base.OnAfterRender(firstRender);
     }
 
-    private void SignIn()
+    private async Task SignIn()
     {
+        string clientIP = userProvider.CurrentIP;
+
         if (clientTab != null)
         {
             if (!userRequired && (string.IsNullOrWhiteSpace(clientTab.Pwd) ||
@@ -181,7 +184,7 @@ else
                 userProvider.CurrentBase = clientTab;
                 userProvider.SaveChangesAsync();
 
-                _cLogger?.SetSignIn(clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
+                await _cLogger?.SetSignIn(clientIP, clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
 
                 navigateManager.NavigateTo("/listnamepage/1");
             }
@@ -202,7 +205,9 @@ else
                     userProvider.CurrentClientNum = clientTab.Id;
                     userProvider.CurrentBase = clientTab;
                     userProvider.SaveChangesAsync();
-                    _cLogger?.SetSignIn(clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
+                    
+                    await _cLogger?.SetSignIn(clientIP, clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
+                    
                     navigateManager.NavigateTo("/listnamepage/1");
                 }
                 else
@@ -231,9 +236,9 @@ else
             return;
         }
 
-        _programLogin.SetNewClient(uname.Value, newEmail.Value, string.IsNullOrWhiteSpace(pwField1.Value) ? null : pwField1.Value);
+        await _programLogin.SetNewClient(uname.Value, newEmail.Value, string.IsNullOrWhiteSpace(pwField1.Value) ? null : pwField1.Value);
         
-        await _cLogger.SetRegistration(newEmail.Value, pwField1.Value, true);
+        await _cLogger.SetRegistration(userProvider.CurrentIP, newEmail.Value, pwField1.Value, true);
         LevelIn = 2;
 
     }

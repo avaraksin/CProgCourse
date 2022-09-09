@@ -1,5 +1,6 @@
 ﻿using Logist.Data;
 using Logist.Common;
+using Logist.Settings;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,22 +16,24 @@ namespace Logist.Data.LogFolder
     public class CommonLoger
     {
         private readonly AppFactory _context;
-        private readonly IHttpContextAccessor _contextAccessor;
-        
+
         public CommonLoger(IDbContextFactory<AppFactory> dbContext, IHttpContextAccessor httpContextAccessor)
         {
             _context = dbContext.CreateDbContext();
-            _contextAccessor = httpContextAccessor;
         }
 
-        public async Task GetUser()
+        public async Task GetUser(string IPaddr)
         {
             var lLog = SetCommonParam();
             lLog.oper = (int) CommonLogStatus.Start;
+            lLog.CompName = IPaddr;
+
+            UserSettings.ClientIP = IPaddr;
+
             await SaveLogRow(lLog);
         }
 
-        public async Task SetRegistration(string email, string pass, bool status = true)
+        public async Task SetRegistration(string IPaddr, string email, string pass, bool status = true)
         {
             var lLog = SetCommonParam();
             
@@ -38,11 +41,12 @@ namespace Logist.Data.LogFolder
             lLog.WinUser = email;
             lLog.param3 = pass;
             lLog.Stats = status ? 1 : 0;
+            lLog.CompName = IPaddr;
 
             await SaveLogRow(lLog);
         }
 
-        public async Task SetSignIn(int clnum, int? userid, string email)
+        public async Task SetSignIn(string IPaddr, int clnum, int? userid, string email)
         {
             
             var lLog = SetCommonParam(clnum);
@@ -51,18 +55,21 @@ namespace Logist.Data.LogFolder
             lLog.ProgUser = userid;
             lLog.WinUser = email;
             lLog.Stats = 1;
+            lLog.CompName = IPaddr;
 
             await SaveLogRow(lLog);
         }
 
-        public async Task SetNavigate(int clnum, int? user, FormOnDisplay page)
+        public async Task SetNavigate(string IPaddr, int clnum, int? user, FormOnDisplay page)
         {
             if (clnum == 0) clnum = -1;
+            // todo всю инициализацию перенести в констуктор
             var lLog = SetCommonParam(clnum);
 
             lLog.Param1 = (int)page;
             lLog.ProgUser = user;
             lLog.oper = (int)CommonLogStatus.NavigateTo;
+            lLog.CompName = IPaddr;
 
             await SaveLogRow(lLog);
         }
@@ -70,28 +77,23 @@ namespace Logist.Data.LogFolder
         private LLog SetCommonParam(int clnum = -1)
         {
             DateTime thisDate = DateTime.Parse(DateTime.Now.ToShortDateString());
+
             return new LLog()
             {
                 LogDt = thisDate,
                 LogTime = DateTime.Now.ToString("HH.mm.ss"),
-                CompName = _contextAccessor?.HttpContext?.Connection?.RemoteIpAddress?.ToString(),
-
                 clnum = clnum,
-                id = _context.lLog.Where(l => l.clnum == clnum && l.LogDt == thisDate).ToList().Count() == 0 ? 
-                    1 :
-                    _context.lLog.Where(l => l.clnum == clnum && l.LogDt == thisDate).Select(n => n.id).Max() + 1
+                id = _context.lLog.Count(l => l.clnum == clnum && l.LogDt == thisDate) + 1
             };
         }
-
+        
         private async Task SaveLogRow(LLog lLog)
         {
-            try 
+            try
             {
-                await Task.Run(async () =>
-                {
-                    await _context.lLog.AddAsync(lLog);
-                    await _context.SaveChangesAsync();
-                });
+                await _context.lLog.AddAsync(lLog);
+                await _context.SaveChangesAsync();
+
             }
             catch { }
         }

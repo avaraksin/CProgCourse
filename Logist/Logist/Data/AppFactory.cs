@@ -2,6 +2,7 @@
 using Logist.Data.Usr;
 using Logist.Data.LogFolder;
 using Logist.Data.MainData;
+using Logist.Data.Pages;
 
 namespace Logist.Data
 {
@@ -17,6 +18,7 @@ namespace Logist.Data
         public DbSet<UserCond> userCond { get; set; }
         public DbSet<LLog> lLog { get; set; }
         public DbSet<LCust> lcust { get; set; }
+        public DbSet<LCustSetting> lCustSettings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,6 +27,7 @@ namespace Logist.Data
             modelBuilder.Entity<Users>().HasKey(c => new { c.clnum, c.id });
             modelBuilder.Entity<UserCond>().HasKey(c => new { c.clnum, c.idUser, c.idCond, c.id, c.id2 });
             modelBuilder.Entity<LLog>().HasKey(c => new { c.clnum, c.id, c.LogDt });
+            modelBuilder.Entity<LCustSetting>().HasKey(c => new { c.clnum, c.id, c.Viewname });
 
             modelBuilder.Entity<Listname>(entity =>
             {
@@ -38,6 +41,7 @@ namespace Logist.Data
             });
 
             modelBuilder.Entity<ClientTab>().HasMany(c => c.users).WithOne().HasForeignKey(u => new {u.clnum});
+
         }
 
     }

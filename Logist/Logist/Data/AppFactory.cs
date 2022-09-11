@@ -28,6 +28,7 @@ namespace Logist.Data
             modelBuilder.Entity<UserCond>().HasKey(c => new { c.clnum, c.idUser, c.idCond, c.id, c.id2 });
             modelBuilder.Entity<LLog>().HasKey(c => new { c.clnum, c.id, c.LogDt });
             modelBuilder.Entity<LCustSetting>().HasKey(c => new { c.clnum, c.id, c.Viewname });
+            modelBuilder.Entity<LCust>().HasKey(c => new {c.clnum, c.id });
 
             modelBuilder.Entity<Listname>(entity =>
             {

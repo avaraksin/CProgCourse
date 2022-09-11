@@ -4,6 +4,7 @@ using Logist.Data.Usr;
 using Logist.Interfaces;
 using Logist.Common;
 using Logist.Data.LogFolder;
+using Logist.Data.MainData;
 using Logist.Settings;
 
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ builder.Services.AddScoped<ProgramLogin>();
 builder.Services.AddScoped<UserConnectionData>();
 builder.Services.AddScoped<CommonLoger>();
 builder.Services.AddScoped<PageSettings>();
+builder.Services.AddScoped<CtrlLCust>();
 
 builder.Services.AddDbContextFactory<AppFactory>(
         options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));

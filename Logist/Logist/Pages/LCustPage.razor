@@ -1,0 +1,40 @@
+﻿@page "/lcustpage"
+
+@inject CtrlLCust _ctrlcust
+
+<h3>Отгрузки</h3>
+
+<MudTable Items="@maindata" Hover="true" 
+    Breakpoint="MudBlazor.Breakpoint.Sm" 
+    @ref="mudTable" 
+    T="LCust"
+    Bordered="true"
+    Striped="true"
+    Dense
+    CustomHeader="true">
+
+        <HeaderContent>
+            <MudTHeadRow Class="header-centered">
+                <MudTh Class="header-centered">№№</MudTh>
+                <MudTh>Продукт</MudTh>
+                <MudTh>LOT</MudTh>
+            </MudTHeadRow>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="ID">@(maindata.IndexOf(context) + 1)</MudTd>
+            <MudTd DataLabel="Короткое имя">@(_ctrlcust.GetListField(context, "product"))</MudTd>
+            <MudTd DataLabel="Полное имя">@_ctrlcust.GetListField(context, "lot")</MudTd>
+        </RowTemplate>
+    </MudTable>
+
+@code {
+    List<LCust> maindata = null;
+    MudTable<LCust> mudTable;
+
+    protected override async Task OnInitializedAsync()
+    {
+        maindata = await _ctrlcust.GetlCust(1);
+        base.OnInitialized();
+    }
+
+}

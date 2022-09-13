@@ -23,6 +23,7 @@ namespace Logist.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<LCustSetting>().ToTable("ViewSettings");
             modelBuilder.Entity<Lists>().HasKey(c => new { c.clnum, c.id });
             modelBuilder.Entity<Users>().HasKey(c => new { c.clnum, c.id });
             modelBuilder.Entity<UserCond>().HasKey(c => new { c.clnum, c.idUser, c.idCond, c.id, c.id2 });

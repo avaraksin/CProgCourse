@@ -1,4 +1,7 @@
-﻿namespace Logist.Data.Pages
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Logist.Data.Pages
 {
     public class LCustSetting
     {
@@ -9,7 +12,7 @@
         public int? TKey { get; set; }
         public int? FVisible { get; set; }
         public int? Locked { get; set; }
-        public int? width { get; set; }
+        public double? width { get; set; }
         public string? FType { get; set; }
         public string? TabName { get; set; }
         public int? Key1 { get; set; }

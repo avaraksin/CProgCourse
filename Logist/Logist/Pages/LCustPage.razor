@@ -4,6 +4,7 @@
 
 <h3>Отгрузки</h3>
 
+
 <MudTable Items="@maindata" Hover="true" 
     Breakpoint="MudBlazor.Breakpoint.Sm" 
     @ref="mudTable" 
@@ -18,12 +19,16 @@
                 <MudTh Class="header-centered">№№</MudTh>
                 <MudTh>Продукт</MudTh>
                 <MudTh>LOT</MudTh>
+                <MudTh>Поставщик</MudTh>
+                <MudTh>ETD план</MudTh>
             </MudTHeadRow>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="ID">@(maindata.IndexOf(context) + 1)</MudTd>
-            <MudTd DataLabel="Короткое имя">@(_ctrlcust.GetListField(context, "product"))</MudTd>
+            <MudTd DataLabel="Короткое имя">@_ctrlcust.GetListField(context, "product")</MudTd>
             <MudTd DataLabel="Полное имя">@_ctrlcust.GetListField(context, "lot")</MudTd>
+            <MudTd DataLabel="Короткое имя">@_ctrlcust.GetListField(context, "supplier")</MudTd>
+            <MudTd DataLabel="Полное имя">@_ctrlcust.GetListField(context, "etd_plan")</MudTd>
         </RowTemplate>
     </MudTable>
 
@@ -31,9 +36,13 @@
     List<LCust> maindata = null;
     MudTable<LCust> mudTable;
 
+    [CascadingParameter]
+    UserProvider userProvider { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        maindata = await _ctrlcust.GetlCust(1);
+        maindata = await _ctrlcust.GetlCust(userProvider.CurrentBase.Id);
+        
         base.OnInitialized();
     }
 

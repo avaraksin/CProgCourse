@@ -24,6 +24,15 @@ namespace Logist.Data
             _ctrlUsers = ctrlUsers;
         }
 
+         public List<Listname>? GetListname(int clnum)
+         {
+            return _dbContext?.listname?.Where(l => l.clnum == clnum &&  l.IsDel == 0)
+                    .OrderBy(l => l.Idlist)
+                    .ThenBy(l => l.id)
+                    .Include(l => l.user)
+                    .ToList();
+         }
+
         public List<Listname>? GetListname(int clnum, int idList)
         {
             return _dbContext?.listname?.Where(l => l.clnum == clnum 

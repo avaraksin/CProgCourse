@@ -8,6 +8,7 @@
 @inject ProgramLogin _programLogin
 @inject CtrlUsers _users
 @inject NavigationManager navigateManager
+@inject ICashDictionary _cash
 
 <h3>Логистика</h3>
 
@@ -20,7 +21,7 @@
 
     userProvider.CurrentUser = _users.GetUsers(1, 32);
 
-    //navigateManager.NavigateTo("/");
+    _cash.Refresh(userProvider.CurrentClientNum);
 }
 
 
@@ -185,6 +186,7 @@ else
                 userProvider.SaveChangesAsync();
 
                 await _cLogger?.SetSignIn(clientIP, clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
+                _cash.Refresh(clientTab.Id);
 
                 navigateManager.NavigateTo("/listnamepage/1");
             }
@@ -205,9 +207,10 @@ else
                     userProvider.CurrentClientNum = clientTab.Id;
                     userProvider.CurrentBase = clientTab;
                     userProvider.SaveChangesAsync();
-                    
+
                     await _cLogger?.SetSignIn(clientIP, clientTab.Id, userProvider?.CurrentUser?.id, clientTab?.Email);
-                    
+
+                    _cash.Refresh(clientTab.Id);
                     navigateManager.NavigateTo("/listnamepage/1");
                 }
                 else

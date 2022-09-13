@@ -14,7 +14,7 @@ namespace Logist.Settings
             _dbContext = dbContext.CreateDbContext();
         }
 
-        public async Task<List<LCustSetting>?> GetSetting(int clnum,  string viewSetting)
+        public List<LCustSetting>? GetSetting(int clnum,  string viewSetting)
         {
             ///
             // По умолчанию все настройки лежат с параметром clnum = 0
@@ -24,8 +24,9 @@ namespace Logist.Settings
             {
                 try
                 {
-                    var existView = await _dbContext.lCustSettings.CountAsync(s => s.clnum == clnum &&
-                                                                                    s.Viewname.ToLower() == viewSetting.ToLower());
+                    var existView = _dbContext.lCustSettings
+                        .Count(s => s.clnum == clnum && s.Viewname.ToLower() == viewSetting.ToLower());
+                    
                     if (existView == 0)
                     {
                         clnum = 0;
@@ -41,8 +42,8 @@ namespace Logist.Settings
 
             try
             {
-                return await _dbContext.lCustSettings.Where(s => s.clnum == clnum &&
-                                                                 s.Viewname.ToLower() == viewSetting.ToLower()).ToListAsync();
+                return _dbContext.lCustSettings.Where(s => s.clnum == clnum &&
+                                                                 s.Viewname.ToLower() == viewSetting.ToLower()).ToList();
             }
             catch
             {

@@ -25,7 +25,12 @@
             <MudItem><MudFab Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Edit" Size="MudBlazor.Size.Small" 
                     OnClick = "@(async () => await CorrectElement())"/></MudItem>
             <MudItem><MudFab Color="MudBlazor.Color.Error" StartIcon="@Icons.Material.Filled.Delete" Size="MudBlazor.Size.Small"
-                    OnClick = "@(async () => await DeleteElement())"/></MudItem>          
+                    OnClick = "@(async () => await DeleteElement())"/></MudItem>
+             @if (UserProvider?.displayForm == FormOnDisplay.FormLCust)
+             {
+                <MudItem><MudFab Color="MudBlazor.Color.Default" Size="MudBlazor.Size.Small" StartIcon="@Icons.Filled.DynamicFeed"
+                        Href="/fieldsettingpage"/></MudItem> 
+             }
         }
      </MudGrid>   
         <MudSpacer/>
@@ -57,7 +62,7 @@
                 <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Home"  IconColor = "@Color.Primary" Href = "/">Главная</MudNavLink>
                 <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.List"  IconColor = "@Color.Primary" Href="/listnamepage/3">Справочники</MudNavLink>
                 <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Group" IconColor = "@Color.Primary" Href="/userpage/1">Пользователи</MudNavLink>
-                <MudNavLink Match="NavLinkMatch.All"  IconColor = "@Color.Primary" Href="/lcustpage">Отгрузки</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Group" IconColor = "@Color.Primary" Href="/lcustpage">Отгрузки</MudNavLink>
             </MudNavMenu>
         </MudNavMenu>
        
@@ -135,7 +140,7 @@
                 AdminUser = UserProvider.CurrentUser.Shortname,
                 cuser = UserProvider.CurrentUser.id
             };
-            
+
             if (await userConnection.CorrectElement(user))
             {
                 navigationManager.NavigateTo($"/userpage/{(int) new Random().Next()}");
@@ -197,8 +202,9 @@
 
     }
 
-    //public async Task TestUserDialog()
-    //{
-    //    await userConnection.CorrectElement(UserProvider.CurrentUser);
-    //}
+    public Task TestLCustDialog()
+    {
+        userConnection?.FieldsSettings(null)?.Wait();
+        return Task.CompletedTask;
+    }
 }

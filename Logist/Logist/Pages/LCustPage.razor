@@ -1,6 +1,7 @@
 ﻿@page "/lcustpage"
 
 @inject CtrlLCust _ctrlcust
+@inject CtrlUserCond _userCond
 
 <h3>Отгрузки</h3>
 
@@ -17,23 +18,28 @@
         <HeaderContent>
             <MudTHeadRow Class="header-centered">
                 <MudTh Class="header-centered">№№</MudTh>
-                <MudTh>Продукт</MudTh>
-                <MudTh>LOT</MudTh>
-                <MudTh>Поставщик</MudTh>
-                <MudTh>ETD план</MudTh>
+                @for (var i = 0; i < fields.Count; i ++)
+                {
+                    var fld = fields[i];
+                    <MudTh>@fld</MudTh>
+                }
             </MudTHeadRow>
         </HeaderContent>
+        
         <RowTemplate>
             <MudTd DataLabel="ID">@(maindata.IndexOf(context) + 1)</MudTd>
-            <MudTd DataLabel="Короткое имя">@_ctrlcust.GetListField(context, "product")</MudTd>
-            <MudTd DataLabel="Полное имя">@_ctrlcust.GetListField(context, "lot")</MudTd>
-            <MudTd DataLabel="Короткое имя">@_ctrlcust.GetListField(context, "supplier")</MudTd>
-            <MudTd DataLabel="Полное имя">@_ctrlcust.GetListField(context, "etd_plan")</MudTd>
+                @for (var i = 0; i < fields.Count; i ++)
+                {
+                    var fld = fields[i];
+                    <MudTd DataLabel="@fld">@_ctrlcust.GetListField(context, fld)</MudTd>
+                }
         </RowTemplate>
     </MudTable>
 
-@code {
+    @code {
     List<LCust> maindata = null;
+    List<string>? fields = null;
+
     MudTable<LCust> mudTable;
 
     [CascadingParameter]
@@ -41,8 +47,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        userProvider.displayForm = FormOnDisplay.FormLCust;
         maindata = await _ctrlcust.GetlCust(userProvider.CurrentBase.Id);
-        
+
+        fields = _userCond.GetVisibleFields(userProvider.CurrentClientNum, userProvider.CurrentUser.id, "lCust", out _);
+
         base.OnInitialized();
     }
 

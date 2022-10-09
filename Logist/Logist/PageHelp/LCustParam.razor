@@ -1,0 +1,78 @@
+﻿@inject ICashDictionary _cash;
+
+<MudDialog DisableSidePadding="true">
+    <DialogContent>
+        <MudContainer Style="max-height: 300px">
+        <MudDropContainer T="FormItem" Items="_items" ItemsSelector="@((item,dropzone) => item.Selector == dropzone)" ItemDropped="ItemUpdated" 
+                Class="d-flex flex-wrap flex-grow-1">
+            <ChildContent>
+                @for (int i = 1; i < 3; i++) 
+                 {
+                     var dropzone = i.ToString();
+                        
+                         <MudPaper Class="ma-4 flex-grow-1" Style="max-height: 300px; overflow-y: scroll">
+                             <MudList Clickable="true" Class="d-flex flex-column mud-height-full mud-width-full">
+                             <MudListSubheader>Drop Zone @dropzone</MudListSubheader>
+                             <MudDropZone T="FormItem" Identifier="@dropzone" Class="flex-grow-1" AllowReorder="true" />
+                         </MudList>
+                     </MudPaper>
+                    
+                 }
+            </ChildContent>
+            <ItemRenderer>
+                <MudListItem Text="@context.Name"/>
+            </ItemRenderer>
+        </MudDropContainer>
+        </MudContainer>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Отмена</MudButton>
+        <MudButton Color="MudBlazor.Color.Primary" OnClick="Submit">Сохранить</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [Parameter] public int clnum { get; set; } = 0;
+    [Parameter] public string TabName { get; set; } = "lCust";
+
+    void Cancel() => MudDialog.Cancel();
+    void Submit() => MudDialog.Cancel();
+
+    public class FormItem
+    {
+        public string Name { get; set; }
+        public string field { get; set; }
+        public string Selector { get; set; }
+    }
+
+    private void ItemUpdated(MudItemDropInfo<FormItem> dropItem)
+    {
+        dropItem.Item.Selector = dropItem.DropzoneIdentifier;
+    }
+
+    List<FormItem> _items = new();
+
+    protected override void OnInitialized()
+    {
+        foreach (var item in _cash.settings.Where(x => x.FVisible == 1).ToList())
+        {
+            _items.Add(
+                new FormItem()
+                {
+                    Name = item.name,
+                    field = item.fieldname,
+                    Selector = "1"
+                }
+            );
+        }
+
+        MudDialog.Options.FullWidth = true;
+
+        base.OnInitialized();
+    }
+
+
+
+}

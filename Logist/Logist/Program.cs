@@ -5,6 +5,7 @@ using Logist.Interfaces;
 using Logist.Common;
 using Logist.Data.LogFolder;
 using Logist.Data.MainData;
+using Logist.Data.Pages;
 using Logist.Settings;
 
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,9 @@ builder.Services.AddScoped<UserConnectionData>();
 builder.Services.AddScoped<CommonLoger>();
 builder.Services.AddSingleton<PageSettings>();
 builder.Services.AddScoped<CtrlLCust>();
+builder.Services.AddScoped<CtrlPageSettings>();
 builder.Services.AddSingleton<ICashDictionary, CashDictionary>();
+builder.Services.AddSingleton<CtrlUserCond>();
 
 builder.Services.AddDbContextFactory<AppFactory>(
         options => options.UseSqlServer("name=ConnectionStrings:WebApiDatabase"));

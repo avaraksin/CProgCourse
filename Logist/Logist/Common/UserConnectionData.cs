@@ -1,14 +1,17 @@
 ﻿using Logist.Data;
 using Logist.Data.Usr;
+using Logist.Data.Pages;
 using Logist.Interfaces;
 
 namespace Logist.Common
 {
     public enum FormOnDisplay
     {
-        FormMain        = 0,
-        FormListname    = 1,
-        FormUsers       = 2
+        FormMain            = 0,
+        FormListname        = 1,
+        FormUsers           = 2,
+        FormLCust           = 3,
+        FormFieldSettings   = 4
     }
 
     public class UserConnectionData
@@ -16,11 +19,13 @@ namespace Logist.Common
 
         private readonly ICtrlListname? _ctrlListname; 
         private readonly CtrlUsers? _ctrlUsers;
+        private readonly CtrlPageSettings _cash;
         
-        public UserConnectionData(ICtrlListname ctrlListname, CtrlUsers ctrlUsers)
+        public UserConnectionData(ICtrlListname ctrlListname, CtrlUsers ctrlUsers, CtrlPageSettings cashDictionary)
         {
             _ctrlListname = ctrlListname;
             _ctrlUsers = ctrlUsers;
+            _cash = cashDictionary;
         }
 
         public async Task<bool>? CorrectElement(object correctItem)
@@ -59,6 +64,11 @@ namespace Logist.Common
                 return await _ctrlUsers?.DeleteItem((Users)Item);
             }
             return false;
+        }
+
+        public async Task<bool>? FieldsSettings(object Item)
+        {
+            return _cash.ShowFieldSettingsDialog(0);
         }
     }
 }

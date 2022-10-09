@@ -1,0 +1,74 @@
+﻿@page "/fieldsettingpage"
+
+@inject ICashDictionary _cash;
+
+<h3>Поля</h3>
+
+<MudContainer Style="max-height: 400px">
+        <MudDropContainer T="FormItem" Items="_items" ItemsSelector="@((item,dropzone) => item.Selector == dropzone)" ItemDropped="ItemUpdated" 
+                Class="d-flex flex-wrap flex-grow-1">
+            <ChildContent>
+            @for (int i = 1; i < 3; i++)
+            {
+                var dropzone = i.ToString();
+
+                             <MudPaper Class="ma-4 flex-grow-1" Style="max-height: 400px; overflow-y: scroll">
+                                 <MudList Clickable="true" Class="d-flex flex-column mud-height-full mud-width-full">
+                                 <!--MudListSubheader>Drop Zone @dropzone</MudListSubheader-->
+                                 <MudDropZone T="FormItem" Identifier="@dropzone" Class="flex-grow-1" AllowReorder="true" />
+                             </MudList>
+                         </MudPaper>
+
+            }
+            </ChildContent>
+            <ItemRenderer>
+                <MudListItem Text="@context.Name"/>
+            </ItemRenderer>
+        </MudDropContainer>
+        </MudContainer>
+
+@code {
+    [CascadingParameter]
+    UserProvider userProvider { get; set; }
+
+    [Parameter] public int clnum { get; set; } = 0;
+    [Parameter] public string TabName { get; set; } = "lCust";
+
+
+
+    public class FormItem
+    {
+        public string Name { get; set; }
+        public string field { get; set; }
+        public string Selector { get; set; }
+    }
+
+    private void ItemUpdated(MudItemDropInfo<FormItem> dropItem)
+    {
+        dropItem.Item.Selector = dropItem.DropzoneIdentifier;
+    }
+
+    List<FormItem> _items = new();
+
+    protected override void OnInitialized()
+    {
+        if (userProvider != null)
+        {
+            userProvider.displayForm = FormOnDisplay.FormFieldSettings;
+        }
+
+        foreach (var item in _cash.settings.Where(x => x.FVisible == 1).ToList())
+        {
+            _items.Add(
+                new FormItem()
+                    {
+                        Name = item.name,
+                        field = item.fieldname,
+                        Selector = "1"
+                    }
+            );
+        }
+
+        base.OnInitialized();
+    }
+}

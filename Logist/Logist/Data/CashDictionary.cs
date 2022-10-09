@@ -2,7 +2,9 @@
 using Logist.Data.Usr;
 using Logist.Interfaces;
 using Logist.Settings;
+using Logist.PageHelp;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 
 namespace Logist.Data
 {
@@ -10,6 +12,7 @@ namespace Logist.Data
     {
         private readonly AppFactory _appFactory;
         private readonly PageSettings _pageSettings;
+        
 
         public List<Listname> listDict { get; set; }
         public List<Users> users { get; set; }
@@ -46,6 +49,6 @@ namespace Logist.Data
             GetSettings(clnum).Wait();
         }
 
-
+        
     }
 }
